@@ -5,7 +5,7 @@
     <title>Update Status Loker</title>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #fce7f3; margin: 0; padding: 20px; color: #334155; }
-        .container { max-w-xl; background: #ffffff; margin: 0 auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-top: 6px solid #ec4899; }
+        .container { max-width: 600px; width: 100%; background: #ffffff; margin: 0 auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-top: 6px solid #ec4899; }
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 { color: #be185d; font-size: 24px; margin: 0; }
         .content { line-height: 1.6; font-size: 16px; }
@@ -37,7 +37,7 @@
                 <strong>Posisi:</strong> {{ $job->posisi }}<br>
                 <strong>Nama Usaha:</strong> {{ $job->nama_usaha }}<br>
                 <strong>Tipe Pekerjaan:</strong> {{ $job->tipe_pekerjaan }}<br>
-                <strong>Tanggal Pengajuan:</strong> {{ $job->created_at->format('d M Y') }}
+                <strong>Tanggal Pengajuan:</strong> {{ $job->created_at->translatedFormat('d M Y') }}
             </div>
 
             @if(in_array($status, ['approved_gratis', 'approved_premium']))

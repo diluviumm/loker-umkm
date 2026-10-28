@@ -10,13 +10,17 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* Cegah blob dekoratif memicu scroll horizontal di layar kecil */
+        html { overflow-x: hidden; }
+
         body {
             font-family: 'Outfit', sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 40%, #16213e 100%);
+            background-color: #16213e;
+            background-image: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 40%, #16213e 100%);
             padding: 1rem;
             position: relative;
             overflow: hidden;
@@ -60,7 +64,7 @@
 
         .icon-badge {
             width: 64px; height: 64px;
-            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            background: linear-gradient(135deg, #db2777, #7c3aed);
             border-radius: 18px;
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 1rem;
@@ -78,7 +82,7 @@
 
         .subtitle {
             font-size: 0.8rem;
-            color: rgba(255,255,255,0.45);
+            color: rgba(255,255,255,0.62);
             font-weight: 500;
         }
 
@@ -135,7 +139,7 @@
             display: block;
             font-size: 0.75rem;
             font-weight: 700;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,255,255,0.72);
             text-transform: uppercase;
             letter-spacing: 0.07em;
             margin-bottom: 0.5rem;
@@ -197,14 +201,14 @@
 
         .remember-row span {
             font-size: 0.82rem;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.68);
             font-weight: 500;
         }
 
         .btn-login {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            background: linear-gradient(135deg, #db2777, #7c3aed);
             border: none;
             border-radius: 12px;
             color: white;
@@ -239,7 +243,7 @@
 
         .back-link a {
             font-size: 0.8rem;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.62);
             text-decoration: none;
             font-weight: 600;
             transition: color 0.2s;
@@ -250,11 +254,17 @@
 
         .back-link a:hover { color: rgba(255,255,255,0.6); }
 
+        @media (max-width: 420px) {
+            .card { padding: 1.75rem 1.5rem; }
+            .btn-login { padding: 0.85rem; font-size: 0.85rem; }
+            .title { font-size: 1.35rem; }
+        }
+
         .security-note {
             text-align: center;
             margin-top: 1.5rem;
             font-size: 0.72rem;
-            color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.5);
             display: flex;
             align-items: center;
             justify-content: center;

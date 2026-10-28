@@ -16,22 +16,22 @@
 </head>
 <body class="min-h-full font-sans antialiased pink-gradient flex items-center justify-center p-4">
 
-    <div class="w-full max-w-md">
+    <div class="w-full max-w-sm">
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center justify-center gap-3 mb-8 group">
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/40 group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-briefcase text-white text-xl"></i>
             </div>
-            <span class="text-3xl font-black text-slate-900">Loker<span class="text-pink-500">UMKM</span></span>
+            <span class="text-2xl font-extrabold text-slate-900">Loker<span class="text-pink-500">UMKM</span></span>
         </a>
 
         <!-- Card -->
-        <div class="bg-white rounded-3xl p-8 card-shadow border border-pink-100">
+        <div class="bg-white rounded-2xl p-6 card-shadow border border-pink-100">
             <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div class="w-14 h-14 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <i class="fa-solid fa-right-to-bracket text-pink-500 text-2xl"></i>
                 </div>
-                <h1 class="text-2xl font-black text-slate-900">Masuk ke Akun Usaha</h1>
+                <h1 class="text-xl font-extrabold text-slate-900">Masuk ke Akun Usaha</h1>
                 <p class="text-slate-500 font-medium mt-1 text-sm">Kelola loker UMKM Anda dengan mudah</p>
             </div>
 
@@ -100,7 +100,7 @@
                 </div>
 
                 <!-- Submit -->
-                <button type="submit" id="btn-login" class="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black rounded-2xl hover:from-pink-600 hover:to-rose-600 shadow-lg shadow-pink-500/35 hover:shadow-pink-500/50 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm">
+                <button type="submit" id="btn-login" class="w-full py-3 bg-gradient-to-r from-pink-600 to-rose-600 text-white font-bold rounded-xl hover:from-pink-700 hover:to-rose-700 shadow-lg shadow-pink-500/35 hover:shadow-pink-500/50 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm">
                     <i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk Sekarang
                 </button>
             </form>
@@ -113,7 +113,7 @@
             </div>
 
             <div class="mt-4 pt-4 border-t border-pink-100 text-center">
-                <a href="{{ route('home') }}" class="text-sm font-bold text-slate-400 hover:text-pink-500 transition-colors">
+                <a href="{{ route('home') }}" class="text-sm font-bold text-slate-500 hover:text-pink-500 transition-colors">
                     <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Beranda
                 </a>
             </div>

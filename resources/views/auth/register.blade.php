@@ -16,22 +16,22 @@
 </head>
 <body class="min-h-full font-sans antialiased pink-gradient flex items-center justify-center p-4 py-10">
 
-    <div class="w-full max-w-lg">
+    <div class="w-full max-w-md">
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center justify-center gap-3 mb-8 group">
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/40 group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-briefcase text-white text-xl"></i>
             </div>
-            <span class="text-3xl font-black text-slate-900">Loker<span class="text-pink-500">UMKM</span></span>
+            <span class="text-2xl font-extrabold text-slate-900">Loker<span class="text-pink-500">UMKM</span></span>
         </a>
 
         <!-- Card -->
-        <div class="bg-white rounded-3xl p-8 card-shadow border border-pink-100">
+        <div class="bg-white rounded-2xl p-6 card-shadow border border-pink-100">
             <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div class="w-14 h-14 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <i class="fa-solid fa-store text-pink-500 text-2xl"></i>
                 </div>
-                <h1 class="text-2xl font-black text-slate-900">Daftar sebagai Pemilik Usaha</h1>
+                <h1 class="text-xl font-extrabold text-slate-900">Daftar sebagai Pemilik Usaha</h1>
                 <p class="text-slate-500 font-medium mt-1 text-sm">Buat akun gratis dan mulai pasang loker UMKM Anda</p>
             </div>
 
@@ -46,21 +46,21 @@
             @endif
 
             <!-- Keuntungan daftar -->
-            <div class="grid grid-cols-3 gap-3 mb-7">
+            <div class="grid grid-cols-3 gap-2 mb-5">
                 <div class="text-center p-3 bg-pink-50 rounded-2xl border border-pink-100">
                     <i class="fa-solid fa-rotate text-pink-500 text-lg mb-1"></i>
                     <p class="text-xs font-black text-slate-700">Data Tersimpan</p>
-                    <p class="text-xs text-slate-500 font-semibold">Tidak perlu isi ulang</p>
+                    <p class="text-xs text-slate-600 font-semibold">Tidak perlu isi ulang</p>
                 </div>
                 <div class="text-center p-3 bg-emerald-50 rounded-2xl border border-emerald-100">
                     <i class="fa-solid fa-chart-line text-emerald-500 text-lg mb-1"></i>
                     <p class="text-xs font-black text-slate-700">Pantau Loker</p>
-                    <p class="text-xs text-slate-500 font-semibold">Status real-time</p>
+                    <p class="text-xs text-slate-600 font-semibold">Status real-time</p>
                 </div>
                 <div class="text-center p-3 bg-blue-50 rounded-2xl border border-blue-100">
                     <i class="fa-solid fa-infinity text-blue-500 text-lg mb-1"></i>
                     <p class="text-xs font-black text-slate-700">Multi Loker</p>
-                    <p class="text-xs text-slate-500 font-semibold">Posting berkali-kali</p>
+                    <p class="text-xs text-slate-600 font-semibold">Posting berkali-kali</p>
                 </div>
             </div>
 
@@ -107,7 +107,7 @@
                             class="w-full pl-11 pr-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-pink-400 focus:outline-none focus:ring-4 focus:ring-pink-100 text-slate-800 font-semibold transition-all text-sm"
                         >
                     </div>
-                    <p class="text-xs text-slate-400 font-semibold mt-1.5">Email ini akan digunakan untuk login</p>
+                    <p class="text-xs text-slate-500 font-semibold mt-1.5">Email ini akan digunakan untuk login</p>
                 </div>
 
                 <!-- Password -->
@@ -159,7 +159,7 @@
                 </div>
 
                 <!-- Submit -->
-                <button type="submit" id="btn-register" class="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black rounded-2xl hover:from-pink-600 hover:to-rose-600 shadow-lg shadow-pink-500/35 hover:shadow-pink-500/50 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm">
+                <button type="submit" id="btn-register" class="w-full py-3 bg-gradient-to-r from-pink-600 to-rose-600 text-white font-bold rounded-xl hover:from-pink-700 hover:to-rose-700 shadow-lg shadow-pink-500/35 hover:shadow-pink-500/50 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm">
                     <i class="fa-solid fa-store mr-2"></i> Buat Akun Usaha Gratis
                 </button>
             </form>
