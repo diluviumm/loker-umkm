@@ -12,6 +12,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('loker:check-expired')
             ->daily()
             ->withoutOverlapping();
+
+        // Retensi dokumen: pratinjau bulanan; hapus hanya bila ENFORCE=true.
+        $prune = 'documents:prune'.(config('loker.retention.enforce') ? ' --force' : '');
+
+        $schedule->command($prune)
+            ->monthlyOn(1, '03:15')
+            ->withoutOverlapping();
     }
 
     protected function commands(): void
