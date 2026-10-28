@@ -111,6 +111,12 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
+    // Seeder produksi & mode demo (dibaca lewat config agar aman saat config:cache).
+    'admin_name'      => env('ADMIN_NAME', 'Super Admin'),
+    'admin_email'     => env('ADMIN_EMAIL'),
+    'admin_password'  => env('ADMIN_PASSWORD'),
+    'allow_demo_seed' => env('ALLOW_DEMO_SEED', false),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

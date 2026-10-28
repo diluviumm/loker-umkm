@@ -11,6 +11,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobDetailController;
 use App\Http\Controllers\JobTrackController;
 use App\Http\Controllers\Pelamar\DashboardController as PelamarDashboard;
+use App\Http\Controllers\Pelamar\ProfileController as PelamarProfile;
 use App\Http\Controllers\Pelamar\SavedJobController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +32,7 @@ Route::post('/loker/{job}/track-click', [JobTrackController::class, 'trackClick'
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])
-        ->middleware('throttle:5,1')
+        ->middleware('throttle:10,1')
         ->name('login.post');
 
     Route::get('/daftar', [AuthController::class, 'registerForm'])->name('register');
@@ -68,6 +69,8 @@ Route::middleware(['auth', 'role:pemilik_usaha'])->prefix('usaha')->name('busine
 // ─── PELAMAR (pencari kerja) ───────────────────────────────────────────
 Route::middleware(['auth', 'role:pelamar'])->prefix('pelamar')->name('pelamar.')->group(function () {
     Route::get('/dashboard', [PelamarDashboard::class, 'index'])->name('dashboard');
+    Route::get('/profil', [PelamarProfile::class, 'edit'])->name('profile.edit');
+    Route::post('/profil', [PelamarProfile::class, 'update'])->name('profile.update');
     Route::post('/simpan/{job}', [SavedJobController::class, 'store'])->name('saved.store');
     Route::delete('/simpan/{job}', [SavedJobController::class, 'destroy'])->name('saved.destroy');
 });

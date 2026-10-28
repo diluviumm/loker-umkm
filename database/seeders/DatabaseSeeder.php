@@ -13,7 +13,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        if (app()->environment('production')) {
+        // Produksi: hanya seeder minimal, kecuali demo hosting diizinkan eksplisit.
+        if (app()->environment('production') && ! config('app.allow_demo_seed')) {
             $this->call(ProductionSeeder::class);
 
             return;

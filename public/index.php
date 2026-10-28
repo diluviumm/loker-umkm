@@ -33,6 +33,11 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 
 require __DIR__.'/../vendor/autoload.php';
 
+// Jangan bocorkan versi PHP di header response.
+if (function_exists('header_remove')) {
+    header_remove('X-Powered-By');
+}
+
 /*
 |--------------------------------------------------------------------------
 | Run The Application

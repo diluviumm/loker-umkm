@@ -16,8 +16,8 @@ class ProductionSeeder extends Seeder
     {
         $this->call(CategorySeeder::class);
 
-        $email = env('ADMIN_EMAIL');
-        $password = env('ADMIN_PASSWORD');
+        $email = config('app.admin_email');
+        $password = config('app.admin_password');
 
         if (! $email || ! $password) {
             $this->command?->error('ADMIN_EMAIL dan ADMIN_PASSWORD belum diisi. Super admin tidak dibuat.');
@@ -28,7 +28,7 @@ class ProductionSeeder extends Seeder
         User::updateOrCreate(
             ['email' => $email],
             [
-                'name'     => env('ADMIN_NAME', 'Super Admin'),
+                'name'     => config('app.admin_name'),
                 'password' => Hash::make($password),
                 'role'     => User::ROLE_ADMIN,
             ]
