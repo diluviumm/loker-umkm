@@ -192,3 +192,83 @@ Setiap butir menyebut file dan alasan.
 - E2E publik: daftar pelamar → simpan/hapus loker → profil + CV (HTTP 200) → OTP (pesan graceful tanpa token) → dokumen tanpa login redirect.
 - HTTP: `/` 200, detail aktif 200, **pending 404**, `/login-wa` 200, `/admin/login` 200, HTTP→HTTPS 301.
 - `composer audit`: tetap 5 advisory (laravel/framework, sudah dimitigasi).
+---
+
+# Sesi 4 — portal, Laravel 12, retensi, hosting produksi (29 Oktober 2026)
+
+## P. Portal `naygars.site`
+
+| Item | Hasil |
+|---|---|
+| Masalah | Node `loker.naygars.site` tidak muncul di grid portal (slot 02 masih placeholder `next` / wildcard) |
+| Perbaikan | `app.js`: objek `NODES.next` diganti `NODES.loker` (status LIVE, tipe LARAVEL APP, root `/srv/loker-umkm/public`, URL https) dan `order` diperbarui |
+| HTML | Kartu carousel, baris daftar, dan dot indikator diganti dari `next` → `loker`; jumlah node tetap **03** |
+| Deploy | `rsync` ke `/srv/naygars-sites/portal/public`, verifikasi desktop 1440 & mobile 390: 0 overflow, dialog menampilkan `loker.naygars.site` |
+
+## Q. Upgrade Laravel 10 → 12
+
+| Item | Sebelum | Sesudah |
+|---|---|---|
+| Framework | 10.50.2 | **12.70.2** |
+| Sanctum | ^3.3 | **^4.0** |
+| PHPUnit | 10 | **11.5.57** |
+| Collision | ^7 | **^8** |
+| `doctrine/dbal`, `spatie/laravel-ignition`, `laravel/sail` | terpasang | **dihapus** (tidak diperlukan di L11+) |
+| `composer audit` | 5 advisory (Laravel 10 EOL) | **0 advisory** |
+| Test | 44 | **49 passed / 136 assertions** |
+
+Temuan saat upgrade:
+
+1. **Route cache basi** — `bootstrap/cache/routes-v7.php` masih memuat `Spatie\LaravelIgnition\...\HealthCheckController` setelah paket dihapus → `route:list` melempar `ReflectionException`. Perbaikan: `route:clear` lalu `route:cache`.
+2. **Lock tidak portabel** — dengan PHP 8.5, Composer mengunci `symfony/*` v8 yang mensyaratkan PHP ≥ 8.4, sehingga gagal dipasang di server (PHP 8.3). Perbaikan: `config.platform.php = 8.3.6` di `composer.json`, lalu `composer update -W`; lock sekarang bisa dipakai PHP 8.3 dan 8.5.
+
+## R. Retensi dokumen (KTP/selfie/CV)
+
+| Item | Detail |
+|---|---|
+| Config | `config/loker.php` → `retention.days` (default **365**) dan `retention.enforce` |
+| Command | `php artisan documents:prune [--days=N] [--force]` — default **pratinjau**, `--force` menghapus |
+| Target | bukti bayar loker berstatus final; identitas pemilik yang **sudah punya loker aktif**; CV pelamar yang tidak diperbarui; referensi DB dikosongkan |
+| Audit | setiap penghapusan dicatat di tabel `document_prunes` (tipe, path, alasan, ukuran) |
+| Jadwal | tanggal 1 pukul 03:15; menghapus hanya bila `DOCUMENT_RETENTION_ENFORCE=true` (server: true) |
+| Test | 5 test: pratinjau tidak menghapus, force menghapus, bukti pending aman, identitas hanya setelah moderasi, CV lama dihapus |
+
+## S. Hosting produksi nyata (server `dilu`)
+
+| Komponen | Detail |
+|---|---|
+| Runtime | PHP **8.3.6 FPM** + Caddy `http://loker.naygars.site` (root `/srv/loker-umkm/public`) |
+| Kode | `rsync` dari laptop (tanpa `.env`, DB, vendor, private uploads) + `composer install --no-dev -o` di server |
+| Aset | `public/build` hasil build laptop di-rsync |
+| DB | SQLite disalin; path di `.env` server diganti `/srv/loker-umkm/database/database.sqlite` |
+| Scheduler | cron tiap menit → `php artisan schedule:run` |
+| Tunnel | `loker.naygars.site` dialihkan dari `localhost:8123` (laptop) → `http://100.108.225.101:80` (Caddy server) |
+| Laptop | `loker-umkm.service` dan `loker-umkm-scheduler.timer` **dihentikan & di-disable** |
+
+Bug yang muncul saat pindah host (dan perbaikannya):
+
+| # | Gejala | Akar masalah | Perbaikan |
+|---|---|---|---|
+| S1 | Halaman detail loker **500** | SQLite `attempt to write a readonly database` (increment `views_count`) | `database/` + `database.sqlite` grup `www-data`, `775/664` |
+| S2 | Log Laravel kosong padahal 500 | `storage/logs` tidak bisa ditulis `www-data` | `chgrp -R www-data storage bootstrap/cache` + `g+rwX` |
+| S3 | `/storage/*` rusak | symlink `public/storage` hasil rsync menunjuk path laptop | `storage:link` ulang di server |
+| S4 | 12 file KTP/selfie lama masih di disk publik | sisa skema lama (sebelum dokumen privat) | dihapus dari `storage/app/public/{dokumen,pembayaran}` (arsip lokal di `~/.hermes/backups/`); probe `/storage/...` → **404** |
+
+## T. Repo publik + backup privat
+
+| Remote | Repo | Visibilitas |
+|---|---|---|
+| `origin` | `diluviumm/loker-umkm` | **private (backup)** |
+| `public` | `diluviumm/loker-umkm-public` | **public (mirror)** |
+
+`bin/ship.sh` mengirim commit ke **keduanya** sekaligus; README §10 mencatat aturan ini.
+
+## U. Verifikasi sesi 4
+
+- `php artisan test` → **49 passed / 136 assertions** (lokal, PHP 8.5).
+- `composer audit` → **0 advisory**.
+- Audit browser di server (18 kombinasi halaman × viewport) → **0 overflow, 0 console error, 0 respons ≥ 400**.
+- E2E produksi: daftar → simpan/hapus loker → profil + CV (**HTTP 200**) → OTP graceful tanpa token → dokumen tanpa login redirect.
+- Login admin dengan password hasil rotasi → **/admin/dashboard**.
+- Header produksi: HSTS, nosniff, X-Frame-Options, Referrer-Policy, `Cache-Control: no-transform`, tanpa `X-Powered-By`.
+- Portal: kartu `loker` tampil di desktop & mobile, dialog berisi URL yang benar.

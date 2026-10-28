@@ -174,17 +174,29 @@ Setiap perubahan **wajib** dikirim ke keduanya:
 
 ---
 
-## 11. Deployment (demo publik)
+## 11. Deployment produksi (server + PHP-FPM)
 
 | Komponen | Detail |
 |---|---|
-| URL | `https://loker.naygars.site` (wildcard `*.naygars.site` → Cloudflare Tunnel) |
-| App server | `systemd --user` unit **`loker-umkm.service`** → `php artisan serve 127.0.0.1:8123` (4 worker CLI) |
-| Scheduler | **`loker-umkm-scheduler.timer`** tiap menit → `php artisan schedule:run` (auto-kadaluarsa harian) |
-| Tunnel | entri `loker.naygars.site → http://localhost:8123` di `~/.cloudflared/config.yml` (sebelum wildcard) |
-| Env produksi | `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `SESSION_SECURE_COOKIE=true`, `ALLOW_DEMO_SEED=true` |
-| Cache | `php artisan optimize` (config + route). **Setiap ubah kode → `php artisan optimize` + restart service** |
+| URL | `https://loker.naygars.site` → Cloudflare Tunnel → Caddy server `dilu` |
+| Lokasi kode | `/srv/loker-umkm` (server `dilu`, Ubuntu 24.04) |
+| Runtime | **PHP 8.3 FPM** (`php8.3-fpm`) + Caddy vhost `http://loker.naygars.site` |
+| Dokumen root | `/srv/loker-umkm/public` |
+| Scheduler | cron `* * * * *` → `php artisan schedule:run` (cek kadaluarsa + retensi) |
+| Tunnel | entri `loker.naygars.site → http://100.108.225.101:80` di `~/.cloudflared/config.yml` |
+| Env produksi | `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `SESSION_SECURE_COOKIE=true`, `ALLOW_DEMO_SEED=true`, `DOCUMENT_RETENTION_ENFORCE=true` |
+| Cache | `php artisan optimize` setelah setiap deploy |
 | Proxy | `TrustProxies = *` + `URL::forceScheme('https')` agar aset tidak mixed-content |
 | Header | HSTS, nosniff, frame-options, referrer-policy, permissions-policy, tanpa `X-Powered-By` |
 
-Catatan: `php artisan serve` cocok untuk demo/PKL. Untuk produksi nyata, ganti ke php-fpm + nginx/Caddy dan matikan `ALLOW_DEMO_SEED`.
+Alur deploy ulang:
+
+```bash
+rsync -az --delete --exclude .git --exclude vendor --exclude node_modules \
+      --exclude 'database/*.sqlite*' --exclude 'storage/app/private/***' \
+      --exclude .env --exclude public/build ./ server:/srv/loker-umkm/
+rsync -az public/build/ server:/srv/loker-umkm/public/build/
+ssh server 'cd /srv/loker-umkm && composer install --no-dev -o && php artisan migrate --force && php artisan optimize'
+```
+
+Izin wajib (sekali): `storage/` & `bootstrap/cache` grup `www-data` + `g+rwX`, dan **`database/` + `database.sqlite` harus bisa ditulis `www-data`** (SQLite menulis jurnal di folder yang sama).
