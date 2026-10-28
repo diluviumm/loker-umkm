@@ -46,18 +46,18 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         @php
             $statItems = [
-                ['label' => 'Total Loker', 'value' => $stats['total'], 'icon' => 'fa-briefcase', 'color' => 'slate'],
-                ['label' => 'Aktif', 'value' => $stats['aktif'], 'icon' => 'fa-circle-check', 'color' => 'emerald'],
-                ['label' => 'Menunggu', 'value' => $stats['pending'], 'icon' => 'fa-clock', 'color' => 'amber'],
-                ['label' => 'Ditolak', 'value' => $stats['ditolak'], 'icon' => 'fa-circle-xmark', 'color' => 'rose'],
-                ['label' => 'Kadaluarsa', 'value' => $stats['kadaluarsa'], 'icon' => 'fa-calendar-xmark', 'color' => 'slate'],
-                ['label' => 'Premium', 'value' => $stats['premium'], 'icon' => 'fa-crown', 'color' => 'orange'],
+                ['label' => 'Total Loker', 'value' => $stats['total'], 'icon' => 'fa-briefcase', 'bg' => 'bg-slate-100', 'fg' => 'text-slate-600'],
+                ['label' => 'Aktif', 'value' => $stats['aktif'], 'icon' => 'fa-circle-check', 'bg' => 'bg-emerald-100', 'fg' => 'text-emerald-600'],
+                ['label' => 'Menunggu', 'value' => $stats['pending'], 'icon' => 'fa-clock', 'bg' => 'bg-amber-100', 'fg' => 'text-amber-600'],
+                ['label' => 'Ditolak', 'value' => $stats['ditolak'], 'icon' => 'fa-circle-xmark', 'bg' => 'bg-rose-100', 'fg' => 'text-rose-600'],
+                ['label' => 'Kadaluarsa', 'value' => $stats['kadaluarsa'], 'icon' => 'fa-calendar-xmark', 'bg' => 'bg-slate-100', 'fg' => 'text-slate-500'],
+                ['label' => 'Premium', 'value' => $stats['premium'], 'icon' => 'fa-crown', 'bg' => 'bg-orange-100', 'fg' => 'text-orange-500'],
             ];
         @endphp
         @foreach($statItems as $stat)
             <div class="bg-white rounded-xl p-3.5 border border-slate-100 shadow-sm text-center">
-                <div class="w-10 h-10 rounded-xl bg-{{ $stat['color'] }}-100 flex items-center justify-center mx-auto mb-2">
-                    <i class="fa-solid {{ $stat['icon'] }} text-{{ $stat['color'] }}-500 text-base"></i>
+                <div class="w-10 h-10 rounded-xl {{ $stat['bg'] }} flex items-center justify-center mx-auto mb-2">
+                    <i class="fa-solid {{ $stat['icon'] }} {{ $stat['fg'] }} text-base"></i>
                 </div>
                 <p class="text-xl font-extrabold text-slate-900">{{ $stat['value'] }}</p>
                 <p class="text-xs font-bold text-slate-500 mt-0.5">{{ $stat['label'] }}</p>
@@ -172,6 +172,10 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+
+            <div class="px-5 py-4 border-t border-slate-100">
+                {{ $lokers->links() }}
             </div>
         @endif
     </div>

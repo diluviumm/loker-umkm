@@ -6,8 +6,7 @@
     <title>Masuk - Info Loker UMKM</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['"Outfit"', 'sans-serif'] } } } }</script>
+    @vite('resources/css/app.css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .pink-gradient { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #fecdd3 100%); }
@@ -31,8 +30,8 @@
                 <div class="w-14 h-14 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <i class="fa-solid fa-right-to-bracket text-pink-500 text-2xl"></i>
                 </div>
-                <h1 class="text-xl font-extrabold text-slate-900">Masuk ke Akun Usaha</h1>
-                <p class="text-slate-500 font-medium mt-1 text-sm">Kelola loker UMKM Anda dengan mudah</p>
+                <h1 class="text-xl font-extrabold text-slate-900">Masuk ke Akun</h1>
+                <p class="text-slate-500 font-medium mt-1 text-sm">Pemilik usaha &amp; pelamar</p>
             </div>
 
             @if($errors->any())
@@ -105,10 +104,17 @@
                 </button>
             </form>
 
+
+            <div class="mt-4">
+                <a href="{{ route('login.wa') }}" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-md shadow-emerald-700/25 transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Masuk dengan WhatsApp (OTP)
+                </a>
+            </div>
+
             <div class="mt-6 text-center">
                 <p class="text-sm font-semibold text-slate-500">
                     Belum punya akun? 
-                    <a href="{{ route('register') }}" class="text-pink-600 font-black hover:underline">Daftar sebagai Pemilik Usaha</a>
+                    <a href="{{ route('register') }}" class="text-pink-600 font-black hover:underline">Daftar akun baru</a>
                 </p>
             </div>
 
@@ -123,7 +129,7 @@
         <div class="mt-5 text-center p-4 bg-white/70 rounded-2xl border border-pink-100">
             <p class="text-xs font-bold text-slate-500">
                 <i class="fa-solid fa-info-circle text-pink-400 mr-1"></i>
-                Pencari kerja tidak perlu login. <a href="{{ route('home') }}" class="text-pink-600 font-black">Cari loker langsung di beranda →</a>
+                Pelamar bisa langsung cari loker tanpa akun. <a href="{{ route('home') }}" class="text-pink-600 font-black">Cari loker di beranda →</a>
             </p>
         </div>
     </div>

@@ -159,7 +159,7 @@
 
                     @if($profile->foto_selfie_ktp)
                         <div class="mb-3 relative">
-                            <img src="{{ $profile->foto_selfie_ktp_url }}" alt="Foto selfie bersama KTP" class="w-full h-32 object-cover rounded-xl border-2 border-emerald-300">
+                            <img src="{{ route('documents.show', ['path' => $profile->foto_selfie_ktp]) }}" alt="Foto selfie bersama KTP" class="w-full h-32 object-cover rounded-xl border-2 border-emerald-300">
                             <span class="absolute top-2 right-2 px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-md">
                                 <i class="fa-solid fa-check"></i> Terunggah
                             </span>
@@ -185,7 +185,7 @@
 
                     @if($profile->foto_sim)
                         <div class="mb-3 relative">
-                            <img src="{{ $profile->foto_sim_url }}" alt="Foto SIM" class="w-full h-32 object-cover rounded-xl border-2 border-emerald-300">
+                            <img src="{{ route('documents.show', ['path' => $profile->foto_sim]) }}" alt="Foto SIM" class="w-full h-32 object-cover rounded-xl border-2 border-emerald-300">
                             <span class="absolute top-2 right-2 px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-md">
                                 <i class="fa-solid fa-check"></i> Terunggah
                             </span>

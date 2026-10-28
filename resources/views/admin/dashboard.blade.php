@@ -320,8 +320,8 @@
                                             <p class="text-xs font-black text-amber-600 uppercase tracking-wide mb-3"><i class="fa-solid fa-money-bill-wave mr-1"></i> Bukti Pembayaran Loker Premium</p>
                                             @if($job->bukti_pembayaran)
                                                 <div class="bg-white p-3 rounded-xl border border-amber-200 text-center max-w-sm mx-auto">
-                                                    <a href="{{ asset('storage/' . $job->bukti_pembayaran) }}" target="_blank" class="block group relative">
-                                                        <img src="{{ asset('storage/' . $job->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="w-full h-48 object-cover rounded-lg border border-slate-200 group-hover:opacity-90 transition-opacity">
+                                                    <a href="{{ route('documents.show', ['path' => $job->bukti_pembayaran]) }}" target="_blank" class="block group relative">
+                                                        <img src="{{ route('documents.show', ['path' => $job->bukti_pembayaran]) }}" alt="Bukti Pembayaran" class="w-full h-48 object-cover rounded-lg border border-slate-200 group-hover:opacity-90 transition-opacity">
                                                         <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center text-white font-black text-xs transition-opacity">
                                                             <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Lihat Gambar Penuh
                                                         </div>
@@ -344,8 +344,8 @@
                                             <div class="bg-white p-3 rounded-xl border border-slate-200 text-center">
                                                 <p class="text-xs font-black text-slate-700 mb-2">Foto Selfie + KTP</p>
                                                 @if($ownerProfile?->foto_selfie_ktp)
-                                                    <a href="{{ $ownerProfile->foto_selfie_ktp_url }}" target="_blank" rel="noopener" class="block group relative">
-                                                        <img src="{{ $ownerProfile->foto_selfie_ktp_url }}" alt="Foto selfie bersama KTP" class="w-full h-36 object-cover rounded-lg border border-slate-200 group-hover:opacity-90 transition-opacity">
+                                                    <a href="{{ route('documents.show', ['path' => $ownerProfile->foto_selfie_ktp]) }}" target="_blank" rel="noopener" class="block group relative">
+                                                        <img src="{{ route('documents.show', ['path' => $ownerProfile->foto_selfie_ktp]) }}" alt="Foto selfie bersama KTP" class="w-full h-36 object-cover rounded-lg border border-slate-200 group-hover:opacity-90 transition-opacity">
                                                         <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center text-white font-black text-xs transition-opacity">
                                                             <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Lihat Gambar Penuh
                                                         </div>
@@ -361,8 +361,8 @@
                                             <div class="bg-white p-3 rounded-xl border border-slate-200 text-center">
                                                 <p class="text-xs font-black text-slate-700 mb-2">Foto SIM</p>
                                                 @if($ownerProfile?->foto_sim)
-                                                    <a href="{{ asset('storage/' . $ownerProfile->foto_sim) }}" target="_blank" class="block group relative">
-                                                        <img src="{{ asset('storage/' . $ownerProfile->foto_sim) }}" alt="Foto SIM" class="w-full h-36 object-cover rounded-lg border border-slate-200 group-hover:opacity-90 transition-opacity">
+                                                    <a href="{{ route('documents.show', ['path' => $ownerProfile->foto_sim]) }}" target="_blank" rel="noopener" class="block group relative">
+                                                        <img src="{{ route('documents.show', ['path' => $ownerProfile->foto_sim]) }}" alt="Foto SIM" class="w-full h-36 object-cover rounded-lg border border-slate-200 group-hover:opacity-90 transition-opacity">
                                                         <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center text-white font-black text-xs transition-opacity">
                                                             <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Lihat Gambar Penuh
                                                         </div>

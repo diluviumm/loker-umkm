@@ -63,6 +63,20 @@
                 </a>
 
                 <div class="flex items-center gap-2 w-full mt-3">
+                    @php
+                        $isSeeker = auth()->check() && auth()->user()->isPelamar();
+                        $isSaved = $isSeeker && auth()->user()->savedJobs()->whereKey($job->id)->exists();
+                    @endphp
+
+                    @if($isSeeker)
+                        <form action="{{ route($isSaved ? 'pelamar.saved.destroy' : 'pelamar.saved.store', $job) }}" method="POST" class="flex-1">
+                            @csrf
+                            @if($isSaved) @method('DELETE') @endif
+                            <button type="submit" class="w-full py-2.5 rounded-xl font-bold text-xs transition-all border inline-flex items-center justify-center gap-1.5 {{ $isSaved ? 'bg-rose-500 text-white border-rose-500' : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100' }}">
+                                <i class="fa-solid fa-heart"></i> {{ $isSaved ? 'Tersimpan' : 'Simpan' }}
+                            </button>
+                        </form>
+                    @else
                     <button
                         x-data="{
                             isSaved: false,
@@ -96,6 +110,7 @@
                         class="flex-1 py-2.5 rounded-xl font-bold text-xs transition-all border inline-flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-heart"></i> <span x-text="isSaved ? 'Tersimpan' : 'Simpan'"></span>
                     </button>
+                    @endif
 
                     <button
                         x-data="{

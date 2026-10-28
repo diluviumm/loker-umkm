@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Sembunyikan scrollbar untuk baris chip yang bisa digeser */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Header transparan dengan blur */
+.glass-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* Gradient hero pink */
+.hero-pink-gradient {
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 45%, #fecdd3 100%);
+}
+
+.card-pink-shadow {
+    box-shadow: 0 10px 30px -12px rgba(244, 63, 94, 0.22);
+}
+
+.card-premium-glow {
+    box-shadow: 0 10px 30px -10px rgba(251, 146, 60, 0.35);
+}

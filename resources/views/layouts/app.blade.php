@@ -12,50 +12,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Outfit"', '"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <style>
-        [x-cloak] { display: none !important; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .glass-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-        }
-
-        .hero-pink-gradient {
-            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 45%, #fecdd3 100%);
-        }
-
-        .card-pink-shadow {
-            box-shadow: 0 10px 30px -12px rgba(244, 63, 94, 0.22);
-        }
-
-        .card-premium-glow {
-            box-shadow: 0 10px 30px -10px rgba(251, 146, 60, 0.35);
-        }
-    </style>
 </head>
 <body class="flex flex-col min-h-full font-sans antialiased text-slate-800 bg-pink-50/50 selection:bg-pink-400 selection:text-white">
 
@@ -89,6 +49,11 @@
                                 <i class="fa-solid fa-shield-halved text-amber-600"></i>
                                 <span class="hidden sm:inline">Dashboard Admin</span>
                             </a>
+                        @elseif(auth()->user()->isPelamar())
+                            <a href="{{ route('pelamar.dashboard') }}" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 transition-all border border-emerald-300 inline-flex items-center gap-2">
+                                <i class="fa-solid fa-user text-emerald-600"></i>
+                                <span class="hidden sm:inline">Dashboard Pelamar</span>
+                            </a>
                         @else
                             <a href="{{ route('business.dashboard') }}" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-pink-700 bg-pink-100 hover:bg-pink-200 transition-all border border-pink-300 inline-flex items-center gap-2">
                                 <i class="fa-solid fa-store text-pink-500"></i>
@@ -104,15 +69,29 @@
                         </form>
                     @else
                         <a href="{{ route('login') }}" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-pink-600 hover:bg-pink-100/60 transition-all hidden md:inline-flex items-center gap-2">
-                            <i class="fa-solid fa-right-to-bracket text-pink-500"></i> Masuk Usaha
+                            <i class="fa-solid fa-right-to-bracket text-pink-500"></i> Masuk
                         </a>
                     @endauth
 
                     <!-- Bookmark -->
-                    <button x-data @click="$dispatch('open-bookmark-modal')" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 transition-all inline-flex items-center gap-2 border border-rose-200" title="Loker tersimpan">
-                        <i class="fa-solid fa-heart"></i>
-                        <span class="hidden lg:inline">Tersimpan</span>
-                    </button>
+                    @auth
+                        @if(auth()->user()->isPelamar())
+                            <a href="{{ route('pelamar.dashboard') }}#tersimpan" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 transition-all inline-flex items-center gap-2 border border-rose-200" title="Loker tersimpan">
+                                <i class="fa-solid fa-heart"></i>
+                                <span class="hidden lg:inline">Tersimpan</span>
+                            </a>
+                        @else
+                            <button x-data @click="$dispatch('open-bookmark-modal')" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 transition-all inline-flex items-center gap-2 border border-rose-200" title="Loker tersimpan">
+                                <i class="fa-solid fa-heart"></i>
+                                <span class="hidden lg:inline">Tersimpan</span>
+                            </button>
+                        @endif
+                    @else
+                        <button x-data @click="$dispatch('open-bookmark-modal')" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 transition-all inline-flex items-center gap-2 border border-rose-200" title="Loker tersimpan">
+                            <i class="fa-solid fa-heart"></i>
+                            <span class="hidden lg:inline">Tersimpan</span>
+                        </button>
+                    @endauth
 
                     <!-- Pasang Loker -->
                     @auth
@@ -220,7 +199,7 @@
                     <ul class="space-y-2 text-sm font-semibold">
                         <li><a href="{{ route('home') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Cari Lowongan</a></li>
                         <li><a href="{{ route('register') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Pasang Loker UMKM</a></li>
-                        <li><a href="{{ route('login') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Login Pemilik Usaha</a></li>
+                        <li><a href="{{ route('login') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Login Akun</a></li>
                         <li><a href="{{ route('admin.login') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Login Admin</a></li>
                     </ul>
                 </div>
@@ -318,26 +297,5 @@
         </div>
     </div>
 
-    <!-- Analytics: klik tombol WhatsApp (delegated, dipakai semua halaman) -->
-    <script>
-        document.addEventListener('click', function (event) {
-            const trigger = event.target.closest('[data-track-job]');
-            if (!trigger) return;
-
-            const jobId = trigger.getAttribute('data-track-job');
-            const token = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (!jobId || !token) return;
-
-            fetch(`/loker/${jobId}/track-click`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': token,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                keepalive: true
-            }).catch(() => {});
-        });
-    </script>
 </body>
 </html>
