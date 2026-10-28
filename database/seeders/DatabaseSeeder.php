@@ -225,5 +225,23 @@ class DatabaseSeeder extends Seeder
                 'expires_at'     => null,
             ]
         );
+
+        // Beri umur berbeda pada data demo agar "x hari lalu" realistis.
+        $demoAge = [
+            'barista-staff-kopi-sejahtera'         => 3,
+            'web-developer-freelance-tokoku'       => 2,
+            'guru-les-privat-sd-smp-bimbel-cerdas' => 5,
+            'staff-akuntansi-keuangan-toko-mas'    => 4,
+            'kasir-admin-toko-baju-medan'          => 6,
+            'freelance-videographer-bali'          => 7,
+            'staff-gudang-distribusi-snack'        => 1,
+        ];
+
+        foreach ($demoAge as $slug => $days) {
+            JobListing::where('slug', $slug)->update([
+                'created_at' => now()->subDays($days),
+                'updated_at' => now()->subDays($days),
+            ]);
+        }
     }
 }

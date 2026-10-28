@@ -17,3 +17,9 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Database lokal (SQLite) & file upload runtime
+/database/*.sqlite
+/database/*.sqlite-journal
+/storage/app/public/pembayaran
+/storage/app/public/dokumen
