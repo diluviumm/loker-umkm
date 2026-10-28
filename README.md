@@ -158,7 +158,23 @@ php artisan test
 
 ---
 
-## 10. Deployment (demo publik)
+## 10. Repositori (dua remote)
+
+| Remote | Repo | Fungsi |
+|---|---|---|
+| `origin` | `diluviumm/loker-umkm` (**private**) | backup utama, sumber kebenaran |
+| `public` | `diluviumm/loker-umkm-public` (**public**) | mirror publik untuk dibagikan |
+| `upstream` | `2411102441058-blip/pkl` | sumber asli (read-only) |
+
+Setiap perubahan **wajib** dikirim ke keduanya:
+
+```bash
+./bin/ship.sh          # git push origin main && git push public main
+```
+
+---
+
+## 11. Deployment (demo publik)
 
 | Komponen | Detail |
 |---|---|
