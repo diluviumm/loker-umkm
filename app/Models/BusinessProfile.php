@@ -22,6 +22,7 @@ class BusinessProfile extends Model
         'medsos_facebook',
         'website',
         'foto_ktp',
+        'foto_selfie_ktp',
         'foto_sim',
         'profil_lengkap',
     ];
@@ -40,6 +41,14 @@ class BusinessProfile extends Model
     public function getFotoKtpUrlAttribute(): ?string
     {
         return $this->foto_ktp ? asset('storage/' . $this->foto_ktp) : null;
+    }
+
+    /**
+     * Revisi: verifikasi identitas memakai selfie + KTP.
+     */
+    public function getFotoSelfieKtpUrlAttribute(): ?string
+    {
+        return $this->foto_selfie_ktp ? asset('storage/' . $this->foto_selfie_ktp) : null;
     }
 
     public function getFotoSimUrlAttribute(): ?string

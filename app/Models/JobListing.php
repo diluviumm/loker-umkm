@@ -23,6 +23,7 @@ class JobListing extends Model
         'gaji',
         'nomor_wa',
         'is_premium',
+        'premium_requested',
         'bukti_pembayaran',
         'status',
         'approved_at',
@@ -32,9 +33,10 @@ class JobListing extends Model
     ];
 
     protected $casts = [
-        'is_premium'  => 'boolean',
-        'approved_at' => 'datetime',
-        'expires_at'  => 'datetime',
+        'is_premium'        => 'boolean',
+        'premium_requested' => 'boolean',
+        'approved_at'       => 'datetime',
+        'expires_at'        => 'datetime',
     ];
 
     // ─── Relasi ─────────────────────────────────────────────────────
@@ -51,7 +53,8 @@ class JobListing extends Model
     // ─── Scopes ─────────────────────────────────────────────────────
 
     /**
-     * FASE 3: Loker aktif, Premium di atas, urut tanggal terbaru.
+     * Loker yang benar-benar tayang: status aktif dan belum kedaluwarsa.
+     * Premium selalu di atas, lalu tanggal approve terbaru.
      */
     public function scopeAktif($query)
     {
@@ -65,24 +68,36 @@ class JobListing extends Model
             ->orderBy('created_at', 'desc');
     }
 
-    // ─── Accessors ──────────────────────────────────────────────────
+    // ─── Helpers ────────────────────────────────────────────────────
 
     /**
-     * Format nomor WA → format internasional 62xxx
+     * Revisi PR Premium: premium hanya boleh disetujui bila pengajuan premium
+     * disertai bukti pembayaran yang tersimpan.
+     */
+    public function hasPaidPremium(): bool
+    {
+        return (bool) $this->premium_requested && filled($this->bukti_pembayaran);
+    }
+
+    /**
+     * Format nomor WA → format internasional 62xxx.
+     * Menangani 08xx, 628xx, +62 8xx, dan 8xx (tanpa awalan).
      */
     public function getFormattedWaNumberAttribute(): string
     {
-        $phone = preg_replace('/[^0-9]/', '', $this->nomor_wa);
+        $phone = preg_replace('/[^0-9]/', '', (string) $this->nomor_wa);
 
         if (Str::startsWith($phone, '0')) {
             $phone = '62' . substr($phone, 1);
+        } elseif (Str::startsWith($phone, '8')) {
+            $phone = '62' . $phone;
         }
 
         return $phone;
     }
 
     /**
-     * Link WA dengan pesan otomatis
+     * Link WA dengan pesan otomatis.
      */
     public function getWaLinkAttribute(): string
     {

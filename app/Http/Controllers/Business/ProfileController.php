@@ -20,26 +20,29 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'nama_pemilik'    => 'required|string|max:255',
-            'nama_usaha'      => 'required|string|max:255',
-            'no_hp'           => 'required|string|max:20',
-            'alamat_usaha'    => 'nullable|string|max:500',
-            'kategori_usaha'  => 'nullable|string|max:100',
-            'deskripsi_usaha' => 'nullable|string|max:1000',
+            'nama_pemilik'     => 'required|string|max:255',
+            'nama_usaha'       => 'required|string|max:255',
+            'no_hp'            => 'required|string|max:20',
+            'alamat_usaha'     => 'nullable|string|max:500',
+            'kategori_usaha'   => 'nullable|string|max:100',
+            'deskripsi_usaha'  => 'nullable|string|max:1000',
             'medsos_instagram' => 'nullable|string|max:100',
-            'medsos_tiktok'   => 'nullable|string|max:100',
-            'medsos_facebook' => 'nullable|string|max:100',
-            'website'         => 'nullable|url|max:255',
-            'foto_ktp'        => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048',
-            'foto_sim'        => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048',
+            'medsos_tiktok'    => 'nullable|string|max:100',
+            'medsos_facebook'  => 'nullable|string|max:100',
+            'website'          => 'nullable|url|max:255',
+            // Revisi: unggah KTP diganti foto selfie bersama KTP.
+            'foto_selfie_ktp'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'foto_sim'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ], [
             'nama_pemilik.required' => 'Nama pemilik wajib diisi.',
             'nama_usaha.required'   => 'Nama usaha wajib diisi.',
             'no_hp.required'        => 'Nomor HP wajib diisi.',
-            'foto_ktp.image'        => 'File KTP harus berupa gambar.',
-            'foto_ktp.max'          => 'Ukuran file KTP maksimal 2MB.',
+            'foto_selfie_ktp.image' => 'File selfie + KTP harus berupa gambar.',
+            'foto_selfie_ktp.mimes' => 'Format selfie + KTP harus JPG, PNG, atau WEBP.',
+            'foto_selfie_ktp.max'   => 'Ukuran foto selfie + KTP maksimal 4MB.',
             'foto_sim.image'        => 'File SIM harus berupa gambar.',
-            'foto_sim.max'          => 'Ukuran file SIM maksimal 2MB.',
+            'foto_sim.mimes'        => 'Format file SIM harus JPG, PNG, atau WEBP.',
+            'foto_sim.max'          => 'Ukuran file SIM maksimal 4MB.',
             'website.url'           => 'Format URL website tidak valid.',
         ]);
 
@@ -50,27 +53,29 @@ class ProfileController extends Controller
             'medsos_tiktok', 'medsos_facebook', 'website',
         ]);
 
-        // Upload foto KTP
-        if ($request->hasFile('foto_ktp')) {
-            // Hapus file lama
-            if ($user->businessProfile?->foto_ktp) {
-                Storage::disk('public')->delete($user->businessProfile->foto_ktp);
+        $uploads = [
+            'foto_selfie_ktp' => 'dokumen/selfie-ktp',
+            'foto_sim'        => 'dokumen/sim',
+        ];
+
+        foreach ($uploads as $field => $folder) {
+            if (! $request->hasFile($field)) {
+                continue;
             }
-            $data['foto_ktp'] = $request->file('foto_ktp')->store('dokumen/ktp', 'public');
+
+            $oldPath = $user->businessProfile?->{$field};
+
+            if ($oldPath) {
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $data[$field] = $request->file($field)->store($folder, 'public');
         }
 
-        // Upload foto SIM
-        if ($request->hasFile('foto_sim')) {
-            if ($user->businessProfile?->foto_sim) {
-                Storage::disk('public')->delete($user->businessProfile->foto_sim);
-            }
-            $data['foto_sim'] = $request->file('foto_sim')->store('dokumen/sim', 'public');
-        }
-
-        // Cek apakah profil sudah lengkap (minimal field wajib)
-        $data['profil_lengkap'] = !empty($data['nama_pemilik'])
-            && !empty($data['nama_usaha'])
-            && !empty($data['no_hp']);
+        // Profil dianggap lengkap bila data wajib terisi.
+        $data['profil_lengkap'] = filled($data['nama_pemilik'] ?? null)
+            && filled($data['nama_usaha'] ?? null)
+            && filled($data['no_hp'] ?? null);
 
         $user->businessProfile()->updateOrCreate(
             ['user_id' => $user->id],

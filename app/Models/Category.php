@@ -13,6 +13,6 @@ class Category extends Model
 
     public function jobListings()
     {
-        return $table = $this->hasMany(JobListing::class);
+        return $this->hasMany(JobListing::class);
     }
 }
