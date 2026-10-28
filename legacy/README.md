@@ -8,3 +8,4 @@ File di folder ini **tidak di-autoload** dan **tidak dirutekan**. Disimpan hanya
 | `public-job-form.blade.php.txt` | `resources/views/jobs/create.blade.php` | View form publik di atas. Memanggil `route('jobs.store')` yang tidak ada, sehingga pasti error bila dirender. |
 
 Form pengganti: `/usaha/pasang-loker` (middleware `auth` + `role:pemilik_usaha`).
+| `welcome.blade.php.txt` | `resources/views/welcome.blade.php` | Halaman sambutan bawaan Laravel. Tidak pernah dirender karena `/` diarahkan ke `HomeController`. |

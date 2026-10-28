@@ -80,3 +80,65 @@ Setiap butir menyebut file dan alasan.
 | F9 | Data demo semuanya tampil "baru saja" | Seeder memberi umur 1-7 hari pada 7 loker contoh | `database/seeders/DatabaseSeeder.php` |
 
 **Bukti verifikasi visual:** 14 kombinasi halaman x viewport (1440 & 390) -> `overflowX = 0`, tanpa console error, tanpa gambar rusak, tanpa respons >= 400. Audit kontras otomatis: 0 pelanggaran pada latar solid (sisa temuan hanya elemen bergradien yang tidak dapat dihitung skrip).
+---
+
+# Sesi 2 — eksekusi gap (28 Oktober 2026, sore)
+
+## G. Gap yang dieksekusi
+
+| # | Gap (dari daftar "belum dikerjakan") | Hasil |
+|---|---|---|
+| G1 | Role pelamar (role ke-3) | `users.role` jadi string; `pelamar` aktif. Registrasi memilih role, redirect ke dashboard pelamar. Middleware `role:pelamar`. |
+| G2 | Dashboard pelamar | `/pelamar/dashboard` + tabel `saved_jobs`; simpan/hapus loker dari halaman detail atau dashboard. |
+| G3 | Login WhatsApp (Fonnte) | Tabel `otp_codes`, `WhatsAppOtpService`, halaman `/login-wa` (2 langkah), throttle 3/menit kirim & 10/menit verifikasi, OTP di-hash, 5 menit, maks 5 percobaan. |
+| G4 | Dokumen privat | Selfie+KTP, SIM, dan bukti bayar disimpan di disk `local` (`storage/app/private/...`); disajikan `/dokumen/{path}` hanya untuk pemilik atau super admin. |
+| G5 | Tailwind produksi (bukan CDN) | `tailwind.config.js`, `postcss.config.js`, `resources/css/app.css`, Alpine di-bundle lewat Vite; layout & 3 halaman auth memakai `@vite`. |
+| G6 | Seeder produksi | `ProductionSeeder` (kategori + admin dari ENV). `DatabaseSeeder` menolak jalan di produksi. `CategorySeeder` dipakai bersama. |
+| G7 | Pagination dashboard usaha | `paginate(10)` + statistik via query terpisah. |
+| G8 | View bawaan Laravel | `welcome.blade.php` dipindah ke `legacy/` (tidak dirender, tidak dihapus). |
+
+## H. Temuan keamanan dependency
+
+`composer audit` awal: **14 advisory / 5 paket**. Setelah `composer update` untuk commonmark, flysystem, symfony/http-foundation, symfony/yaml → **5 advisory / 1 paket**, semuanya `laravel/framework` (Laravel 10 sudah EOL):
+
+| Severity | Advisory | Mitigasi di aplikasi |
+|---|---|---|
+| critical | TokenGuard auth bypass (CVE-2026-114509) | Route API berbasis token (`/api/user`) dihapus — tidak ada permukaan TokenGuard |
+| high | CRLF injection pada rule `email` | Middleware `SanitizeInput` membuang `\r` dan NUL dari semua input |
+| medium | Temporary signed URL path confusion | Aplikasi tidak memakai signed URL |
+| low | XSS di halaman debug | `APP_DEBUG=false` untuk produksi didokumentasikan |
+| – | duplikat advisory CRLF | sama dengan di atas |
+
+**Belum ditambal (butuh upgrade framework):** Laravel 10 → 12. Ini pekerjaan tersendiri, bukan tambal sulam.
+
+## I. Bug baru yang ditemukan saat implementasi
+
+| # | Temuan | Perbaikan |
+|---|---|---|
+| I1 | Kode OTP ikut ditulis ke `laravel.log` di **semua** environment bila `FONNTE_TOKEN` kosong | Log kode hanya di `local`/`testing`; produksi hanya warning tanpa kode |
+| I2 | `DocumentController` bisa menyajikan file apa pun di disk lokal (mis. `config/app.php`) untuk admin | Whitelist prefix `private/`, `dokumen/`, `pembayaran/` |
+| I3 | Kelas Tailwind dinamis (`bg-{{ $color }}-100`) tidak akan ter-generate saat build | Diganti kelas statis (`bg`/`fg` per item) |
+| I4 | Hapus loker tersimpan tanpa konfirmasi | Ditambah `confirm()` |
+| I5 | Kartu benefit di halaman daftar hanya relevan untuk pemilik usaha | Diganti netral: Gratis / Simpan Loker / Lamar via WA |
+| I6 | Helper text abu-abu muda di login-wa & daftar | Dinaikkan kontrasnya |
+| I7 | OTP menumpuk tanpa pembersihan | Hapus kode kedaluwarsa > 1 hari saat membuat kode baru |
+
+## J. Sisa yang belum dikerjakan (jujur)
+
+| # | Item | Kenapa belum | Yang dibutuhkan |
+|---|---|---|---|
+| J1 | Payment gateway (Midtrans/Xendit) | Butuh akun merchant + kunci API | Kredensial dari Mael |
+| J2 | Upgrade Laravel 10 → 12 | Perubahan mayor (bootstrap, middleware, dependency); risiko regresi tinggi bila dicampur sesi ini | Sesi khusus + regression test |
+| J3 | Fonnte produksi | Kode siap, token belum ada | `FONNTE_TOKEN` + nomor device |
+| J4 | Profil pelamar (CV, pengalaman, foto) | Di luar revisi; pelamar saat ini hanya simpan loker | Keputusan produk |
+| J5 | Notifikasi WA otomatis saat status loker berubah | Bisa memakai Fonnte yang sama | Token Fonnte |
+| J6 | Retensi dokumen (auto-hapus selfie/KTP/bukti) | Butuh kebijakan pemilik data | Keputusan kebijakan |
+
+## K. Verifikasi sesi 2
+
+- `php artisan test` → **38 passed / 99 assertions**.
+- `php -l` seluruh `app/config/routes/tests/database` bersih; `php artisan view:cache` sukses.
+- `npm run build` → CSS 52.45 kB + JS 115.42 kB (Alpine bundled), manifest dipakai `@vite`.
+- Audit browser 17 kombinasi halaman × viewport: **0 overflow, 0 console error, 0 gambar rusak, 0 respons ≥ 400**.
+- E2E Playwright: pilih role pelamar → daftar → simpan loker → hapus → login OTP WhatsApp → dashboard pemilik; dokumen tanpa login → redirect. Semua lulus.
+- `composer audit`: 5 advisory (semua laravel/framework, sudah dimitigasi).

@@ -13,12 +13,19 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->call(ProductionSeeder::class);
+
+            return;
+        }
+
         // 1. Create Default Super Admin
         User::updateOrCreate(
             ['email' => 'admin@loker.com'],
             [
                 'name'     => 'Admin Utama',
                 'email'    => 'admin@loker.com',
+                'phone'    => '6281100000001',
                 'password' => Hash::make('password123'),
                 'role'     => 'super_admin',
             ]
@@ -30,6 +37,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name'     => 'Sari Pemilik',
                 'email'    => 'umkm@loker.com',
+                'phone'    => '6281234567890',
                 'password' => Hash::make('password123'),
                 'role'     => 'pemilik_usaha',
             ]
@@ -41,7 +49,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_pemilik'     => 'Sari Pemilik',
                 'nama_usaha'       => 'Kopi Sejahtera UMKM',
-                'no_hp'            => '081234567890',
+                'no_hp'            => '6281234567890',
                 'alamat_usaha'     => 'Bandung, Jawa Barat',
                 'kategori_usaha'   => 'Kuliner & F&B',
                 'deskripsi_usaha'  => 'Kedai kopi kekinian yang menjual berbagai varian minuman kopi dan non-kopi.',
@@ -50,30 +58,20 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 3. Create Categories (termasuk Freelance, Guru, IT, Admin, Akuntansi, dll)
-        $categories = [
-            ['nama' => 'Freelance', 'icon' => 'fa-laptop-code'],
-            ['nama' => 'Guru & Pendidikan', 'icon' => 'fa-graduation-cap'],
-            ['nama' => 'IT & Teknologi', 'icon' => 'fa-code'],
-            ['nama' => 'Admin & Kasir', 'icon' => 'fa-cash-register'],
-            ['nama' => 'Akuntansi & Keuangan', 'icon' => 'fa-calculator'],
-            ['nama' => 'Kuliner & Resto', 'icon' => 'fa-utensils'],
-            ['nama' => 'Retail & Toko', 'icon' => 'fa-store'],
-            ['nama' => 'Marketing & Medsos', 'icon' => 'fa-bullhorn'],
-            ['nama' => 'Driver & Kurir', 'icon' => 'fa-motorcycle'],
-            ['nama' => 'Jasa & Kebersihan', 'icon' => 'fa-broom'],
-            ['nama' => 'Teknik & Bengkel', 'icon' => 'fa-wrench'],
-        ];
+        // 2b. Akun pelamar demo
+        $pelamar = User::updateOrCreate(
+            ['email' => 'pelamar@loker.com'],
+            [
+                'name'     => 'Rina Pelamar',
+                'email'    => 'pelamar@loker.com',
+                'phone'    => '6285555555555',
+                'password' => Hash::make('password123'),
+                'role'     => 'pelamar',
+            ]
+        );
 
-        foreach ($categories as $cat) {
-            Category::updateOrCreate(
-                ['slug' => Str::slug($cat['nama'])],
-                [
-                    'nama' => $cat['nama'],
-                    'icon' => $cat['icon'],
-                ]
-            );
-        }
+        // 3. Kategori (dipakai bersama oleh seeder demo & produksi)
+        $this->call(CategorySeeder::class);
 
         $catFreelance = Category::where('slug', 'freelance')->first();
         $catGuru = Category::where('slug', 'guru-pendidikan')->first();
@@ -236,6 +234,11 @@ class DatabaseSeeder extends Seeder
             'freelance-videographer-bali'          => 7,
             'staff-gudang-distribusi-snack'        => 1,
         ];
+
+        // Simpan beberapa loker contoh untuk akun pelamar demo
+        $savedSlugs = ['barista-staff-kopi-sejahtera', 'web-developer-freelance-tokoku'];
+        $savedIds = JobListing::whereIn('slug', $savedSlugs)->pluck('id');
+        $pelamar->savedJobs()->syncWithoutDetaching($savedIds);
 
         foreach ($demoAge as $slug => $days) {
             JobListing::where('slug', $slug)->update([
