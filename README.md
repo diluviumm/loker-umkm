@@ -115,7 +115,7 @@ Buka `http://127.0.0.1:8000`. Untuk mode pengembangan aset: `npm run dev` (Vite 
 
 | Peran | Email | Password | WhatsApp |
 |---|---|---|---|
-| Super Admin | `admin@loker.com` | `password123` | `6281100000001` |
+| Super Admin | `admin@loker.com` | `password123` (lokal) · **demo publik sudah dirotasi** → `~/.hermes/.secrets/loker-umkm-admin.txt` | `6281100000001` |
 | Pemilik Usaha | `umkm@loker.com` | `password123` | `6281234567890` |
 | Pelamar | `pelamar@loker.com` | `password123` | `6285555555555` |
 
