@@ -183,6 +183,7 @@ Setiap perubahan **wajib** dikirim ke keduanya:
 | Runtime | **PHP 8.3 FPM** (`php8.3-fpm`) + Caddy vhost `http://loker.naygars.site` |
 | Dokumen root | `/srv/loker-umkm/public` |
 | Scheduler | cron `* * * * *` → `php artisan schedule:run` (cek kadaluarsa + retensi) |
+| Backup | cron `20 3 * * *` → `~/scripts/backup-loker.sh` (SQLite online backup + dokumen privat, retensi 14 hari) |
 | Tunnel | entri `loker.naygars.site → http://100.108.225.101:80` di `~/.cloudflared/config.yml` |
 | Env produksi | `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `SESSION_SECURE_COOKIE=true`, `ALLOW_DEMO_SEED=true`, `DOCUMENT_RETENTION_ENFORCE=true` |
 | Cache | `php artisan optimize` setelah setiap deploy |

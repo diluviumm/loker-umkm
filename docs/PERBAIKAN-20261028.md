@@ -244,6 +244,7 @@ Temuan saat upgrade:
 | Scheduler | cron tiap menit → `php artisan schedule:run` |
 | Tunnel | `loker.naygars.site` dialihkan dari `localhost:8123` (laptop) → `http://100.108.225.101:80` (Caddy server) |
 | Laptop | `loker-umkm.service` dan `loker-umkm-scheduler.timer` **dihentikan & di-disable** |
+| Backup | `~/scripts/backup-loker.sh` (cron 03:20) → SQLite `.backup` + `private/` tar.gz, retensi 14 hari, diuji manual |
 
 Bug yang muncul saat pindah host (dan perbaikannya):
 
