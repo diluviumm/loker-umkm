@@ -2,57 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JobListing;
 use App\Mail\JobStatusMail;
+use App\Models\JobListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class AdminDashboardController extends Controller
 {
     /**
-     * Tampilkan form login Admin
+     * Tampilkan form login Admin.
      */
     public function loginForm()
     {
         if (Auth::check()) {
-            return redirect()->route('admin.dashboard');
+            return $this->redirectByRole();
         }
+
         return view('admin.login');
     }
 
     /**
-     * Proses Login Admin
+     * Proses login Admin.
+     *
+     * Catatan keamanan: tidak ada lagi "auto-fix password" saat hash korup.
+     * Perilaku lama memungkinkan siapa pun menimpa password akun mana pun
+     * hanya dengan memicu RuntimeException dari Hash::check().
      */
     public function login(Request $request)
     {
         $credentials = $request->validate([
             'email'    => 'required|email',
             'password' => 'required',
+        ], [
+            'email.required'    => 'Email admin wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
-        try {
-            $loggedIn = Auth::attempt($credentials, $request->boolean('remember'));
-        } catch (\RuntimeException $e) {
-            // Password di DB bukan format bcrypt — auto-fix dan coba lagi
-            \Illuminate\Support\Facades\DB::table('users')
-                ->where('email', $credentials['email'])
-                ->update(['password' => \Illuminate\Support\Facades\Hash::make($credentials['password'])]);
-
-            $loggedIn = Auth::attempt($credentials, $request->boolean('remember'));
-        }
-
-        if ($loggedIn) {
-            // Pastikan user yang login adalah super_admin
-            if (Auth::user()->role !== 'super_admin') {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            if (! Auth::user()->isSuperAdmin()) {
                 Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
                 return back()->withErrors([
                     'email' => 'Akses ditolak. Halaman ini khusus Admin.',
                 ])->onlyInput('email');
             }
 
             $request->session()->regenerate();
-            return redirect()->route('admin.dashboard')->with('success', 'Selamat datang kembali, Admin!');
+
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Selamat datang kembali, Admin!');
         }
 
         return back()->withErrors([
@@ -61,35 +64,37 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * Logout Admin
+     * Logout Admin.
      */
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('admin.login')->with('success', 'Berhasil keluar dari sesi Admin.');
     }
 
     /**
-     * Dashboard Utama Moderasi Admin (FASE 2)
+     * Dashboard moderasi: daftar loker + statistik.
      */
     public function dashboard(Request $request)
     {
         $statusFilter = $request->input('status', 'pending');
+        $allowed = ['pending', 'aktif', 'ditolak', 'kadaluarsa'];
 
         $stats = [
-            'total' => JobListing::count(),
-            'pending' => JobListing::where('status', 'pending')->count(),
-            'aktif' => JobListing::where('status', 'aktif')->count(),
-            'ditolak' => JobListing::where('status', 'ditolak')->count(),
+            'total'      => JobListing::count(),
+            'pending'    => JobListing::where('status', 'pending')->count(),
+            'aktif'      => JobListing::where('status', 'aktif')->count(),
+            'ditolak'    => JobListing::where('status', 'ditolak')->count(),
             'kadaluarsa' => JobListing::where('status', 'kadaluarsa')->count(),
-            'premium' => JobListing::where('is_premium', true)->count(),
+            'premium'    => JobListing::where('is_premium', true)->count(),
         ];
 
         $query = JobListing::with(['category', 'user.businessProfile'])->latest();
 
-        if (in_array($statusFilter, ['pending', 'aktif', 'ditolak', 'kadaluarsa'])) {
+        if (in_array($statusFilter, $allowed, true)) {
             $query->where('status', $statusFilter);
         }
 
@@ -99,66 +104,108 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * FASE 2: Jalur YA - Admin menyetujui loker (Gratis / Premium)
+     * Setujui loker.
+     *
+     * Revisi PR Premium: status premium ditentukan oleh bukti pembayaran.
+     * - Sudah bayar (pengajuan premium + bukti ada) → wajib Premium.
+     * - Belum bayar → wajib Gratis (tombol premium tidak tersedia di UI,
+     *   dan parameter is_premium dari request diabaikan/ditolak).
      */
     public function approve(Request $request, JobListing $job)
     {
-        $isPremium = $request->boolean('is_premium', false);
+        $paidPremium = $job->hasPaidPremium();
+        $isReactivation = $job->status !== 'pending';
 
-        $job->update([
-            'status' => 'aktif',
-            'is_premium' => $isPremium,
-            'approved_at' => now(),
-            'expires_at' => now()->addDays(30),
-        ]);
+        // Aturan pemilihan jalur hanya berlaku saat menyetujui pengajuan baru.
+        if (! $isReactivation) {
+            if ($request->boolean('is_premium') && ! $paidPremium) {
+                return back()->with('error', 'Loker ini belum punya bukti pembayaran premium yang valid. Setujui sebagai Gratis, atau minta pemilik mengunggah bukti pembayaran.');
+            }
 
-        if ($job->user && $job->user->email) {
-            $mailStatus = $isPremium ? 'approved_premium' : 'approved_gratis';
-            Mail::to($job->user->email)->send(new JobStatusMail($job, $mailStatus));
+            if (! $request->boolean('is_premium') && $paidPremium) {
+                return back()->with('error', 'Loker ini sudah dibayar sebagai Premium — persetujuan gratis dinonaktifkan. Gunakan tombol Setujui Premium.');
+            }
         }
 
-        $statusText = $isPremium ? 'Aktif (PREMIUM ⭐)' : 'Aktif (Gratis)';
+        $job->update([
+            'status'      => 'aktif',
+            'is_premium'  => $paidPremium,
+            'approved_at' => now(),
+            'expires_at'  => now()->addDays(30),
+        ]);
 
-        return redirect()->back()->with('success', "Lowongan '{$job->posisi}' di '{$job->nama_usaha}' berhasil disetujui dengan status: {$statusText}.");
+        $this->notifyOwner($job, $paidPremium ? 'approved_premium' : 'approved_gratis');
+
+        $statusText = $paidPremium ? 'Aktif (PREMIUM)' : 'Aktif (Gratis)';
+
+        return back()->with('success', "Lowongan '{$job->posisi}' di '{$job->nama_usaha}' berhasil disetujui dengan status: {$statusText}.");
     }
 
     /**
-     * FASE 2: Jalur TIDAK - Admin menolak loker
+     * Tolak loker.
      */
     public function reject(JobListing $job)
     {
-        $job->update([
-            'status' => 'ditolak',
-        ]);
+        $job->update(['status' => 'ditolak']);
 
-        if ($job->user && $job->user->email) {
-            Mail::to($job->user->email)->send(new JobStatusMail($job, 'rejected'));
-        }
+        $this->notifyOwner($job, 'rejected');
 
-        return redirect()->back()->with('success', "Lowongan '{$job->posisi}' di '{$job->nama_usaha}' telah DITOLAK.");
+        return back()->with('success', "Lowongan '{$job->posisi}' di '{$job->nama_usaha}' telah ditolak.");
     }
 
     /**
-     * Toggle Fitur Premium pada loker yang sudah aktif
+     * Toggle fitur premium pada loker yang sudah aktif.
      */
     public function togglePremium(JobListing $job)
     {
         $job->update([
-            'is_premium' => !$job->is_premium,
+            'is_premium' => ! $job->is_premium,
         ]);
 
-        $statusStr = $job->is_premium ? 'diaktifkan sebagai Premium ⭐' : 'diubah menjadi Gratis';
+        $statusStr = $job->is_premium
+            ? 'diaktifkan sebagai Premium'
+            : 'diubah menjadi Gratis';
 
-        return redirect()->back()->with('success', "Status Premium loker '{$job->posisi}' berhasil {$statusStr}.");
+        return back()->with('success', "Status premium loker '{$job->posisi}' berhasil {$statusStr}.");
     }
 
     /**
-     * Hapus Loker dari Database
+     * Hapus loker dari database.
      */
     public function destroy(JobListing $job)
     {
         $job->delete();
 
-        return redirect()->back()->with('success', 'Data lowongan kerja berhasil dihapus.');
+        return back()->with('success', 'Data lowongan kerja berhasil dihapus.');
+    }
+
+    /**
+     * Kirim email status ke pemilik usaha tanpa membuat request 500
+     * ketika SMTP belum dikonfigurasi.
+     */
+    private function notifyOwner(JobListing $job, string $status): void
+    {
+        $email = $job->user?->email;
+
+        if (! $email) {
+            return;
+        }
+
+        try {
+            Mail::to($email)->send(new JobStatusMail($job, $status));
+        } catch (\Throwable $e) {
+            Log::warning('Gagal mengirim email status loker', [
+                'job_id' => $job->id,
+                'email'  => $email,
+                'error'  => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function redirectByRole()
+    {
+        return Auth::user()->isSuperAdmin()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('business.dashboard');
     }
 }

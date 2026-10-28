@@ -3,27 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobListing;
-use Illuminate\Http\Request;
 
 class JobDetailController extends Controller
 {
     /**
-     * Menampilkan Halaman Detail Loker (FASE 3)
+     * Halaman detail loker.
+     *
+     * Hanya loker berstatus aktif & belum kedaluwarsa yang boleh tayang
+     * untuk publik (loker pending/ditolak tidak boleh bocor lewat slug).
      */
     public function show($slug)
     {
         $job = JobListing::with('category')
             ->where('slug', $slug)
+            ->where('status', 'aktif')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                  ->orWhere('expires_at', '>', now());
+            })
             ->firstOrFail();
 
-        // Increment jumlah kali dilihat (Analytics)
         $job->increment('views_count');
 
-        // Rekomendasi Loker Serupa
+        // Rekomendasi loker serupa dari kategori yang sama.
         $relatedJobs = JobListing::aktif()
             ->where('id', '!=', $job->id)
-            ->where('category_id', $job->category_id)
-            ->limit(4)
+            ->when($job->category_id, fn ($q) => $q->where('category_id', $job->category_id))
+            ->limit(3)
             ->get();
 
         return view('jobs.show', compact('job', 'relatedJobs'));
