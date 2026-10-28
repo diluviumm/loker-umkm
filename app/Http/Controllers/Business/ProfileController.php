@@ -53,9 +53,14 @@ class ProfileController extends Controller
             'medsos_tiktok', 'medsos_facebook', 'website',
         ]);
 
+        // Nomor disimpan dalam format 62xxx agar konsisten untuk WA link & OTP.
+        if (! empty($data['no_hp'])) {
+            $data['no_hp'] = app(\App\Services\WhatsAppOtpService::class)->normalize($data['no_hp']);
+        }
+
         $uploads = [
-            'foto_selfie_ktp' => 'dokumen/selfie-ktp',
-            'foto_sim'        => 'dokumen/sim',
+            'foto_selfie_ktp' => 'private/selfie-ktp',
+            'foto_sim'        => 'private/sim',
         ];
 
         foreach ($uploads as $field => $folder) {
@@ -66,10 +71,11 @@ class ProfileController extends Controller
             $oldPath = $user->businessProfile?->{$field};
 
             if ($oldPath) {
+                Storage::disk('local')->delete($oldPath);
                 Storage::disk('public')->delete($oldPath);
             }
 
-            $data[$field] = $request->file($field)->store($folder, 'public');
+            $data[$field] = $request->file($field)->store($folder, 'local');
         }
 
         // Profil dianggap lengkap bila data wajib terisi.
@@ -81,6 +87,16 @@ class ProfileController extends Controller
             ['user_id' => $user->id],
             $data
         );
+
+        if (! $user->phone && ! empty($data['no_hp'])) {
+            $taken = \App\Models\User::where('phone', $data['no_hp'])
+                ->whereKeyNot($user->id)
+                ->exists();
+
+            if (! $taken) {
+                $user->update(['phone' => $data['no_hp']]);
+            }
+        }
 
         return redirect()->route('business.dashboard')
             ->with('success', 'Profil usaha berhasil disimpan!');

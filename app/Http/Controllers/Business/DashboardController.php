@@ -12,19 +12,19 @@ class DashboardController extends Controller
         $user    = auth()->user();
         $profile = $user->businessProfile;
 
+        $stats = [
+            'total'      => $user->jobListings()->count(),
+            'aktif'      => $user->jobListings()->where('status', 'aktif')->count(),
+            'pending'    => $user->jobListings()->where('status', 'pending')->count(),
+            'ditolak'    => $user->jobListings()->where('status', 'ditolak')->count(),
+            'kadaluarsa' => $user->jobListings()->where('status', 'kadaluarsa')->count(),
+            'premium'    => $user->jobListings()->where('is_premium', true)->count(),
+        ];
+
         $lokers = $user->jobListings()
             ->with('category')
             ->latest()
-            ->get();
-
-        $stats = [
-            'total'     => $lokers->count(),
-            'aktif'     => $lokers->where('status', 'aktif')->count(),
-            'pending'   => $lokers->where('status', 'pending')->count(),
-            'ditolak'   => $lokers->where('status', 'ditolak')->count(),
-            'kadaluarsa' => $lokers->where('status', 'kadaluarsa')->count(),
-            'premium'   => $lokers->where('is_premium', true)->count(),
-        ];
+            ->paginate(10);
 
         return view('business.dashboard', compact('user', 'profile', 'lokers', 'stats'));
     }

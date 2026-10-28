@@ -36,7 +36,7 @@ class BusinessFlowTest extends TestCase
         $this->assertNotNull($profile);
         $this->assertTrue($profile->profil_lengkap);
         $this->assertNotNull($profile->foto_selfie_ktp);
-        Storage::disk('public')->assertExists($profile->foto_selfie_ktp);
+        Storage::disk('local')->assertExists($profile->foto_selfie_ktp);
     }
 
     public function test_profil_menolak_file_selain_gambar(): void

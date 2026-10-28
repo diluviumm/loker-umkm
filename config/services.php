@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Gateway WhatsApp untuk OTP login. Tanpa token, OTP ditulis ke log.
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+        'url'   => env('FONNTE_URL', 'https://api.fonnte.com/send'),
+    ],
+
 ];

@@ -48,11 +48,11 @@ class BusinessProfile extends Model
      */
     public function getFotoSelfieKtpUrlAttribute(): ?string
     {
-        return $this->foto_selfie_ktp ? asset('storage/' . $this->foto_selfie_ktp) : null;
+        return $this->foto_selfie_ktp ? route('documents.show', ['path' => $this->foto_selfie_ktp]) : null;
     }
 
     public function getFotoSimUrlAttribute(): ?string
     {
-        return $this->foto_sim ? asset('storage/' . $this->foto_sim) : null;
+        return $this->foto_sim ? route('documents.show', ['path' => $this->foto_sim]) : null;
     }
 }

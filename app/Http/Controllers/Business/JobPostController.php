@@ -59,7 +59,7 @@ class JobPostController extends Controller
         $buktiPath = null;
 
         if ($request->hasFile('bukti_pembayaran')) {
-            $buktiPath = $request->file('bukti_pembayaran')->store('pembayaran', 'public');
+            $buktiPath = $request->file('bukti_pembayaran')->store('private/pembayaran', 'local');
         }
 
         $wantsPremium = $request->boolean('is_premium');
