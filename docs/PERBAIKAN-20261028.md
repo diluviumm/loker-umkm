@@ -62,6 +62,8 @@ Setiap butir menyebut file dan alasan.
 - Semua file PHP lolos `php -l`; semua Blade lolos `php artisan view:cache`.
 - Smoke test HTTP: `/` 200, detail aktif 200, **detail pending 404**, `/admin/reset-admin-password` 404, aset 200.
 - Verifikasi visual: screenshot desktop 1440px & mobile 390px untuk beranda, detail, login, register, dashboard usaha, form loker, profil, admin.
+- `hermes verify --json` (recipe Laravel di `.hermes/environment.json`): **ok=true** — bootstrap `composer install`, build `npm ci && npm run build`, test `php artisan test` (22 passed), start `php artisan serve` + readiness `/` HTTP 200.
+- Build aset Vite kini benar-benar jalan (`npm run build` → `public/build`), walau tampilan masih memakai Tailwind CDN.
 
 ## F. Polish setelah audit visual (browser + kontras)
 

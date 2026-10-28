@@ -1,0 +1,17 @@
+{
+  "name": "Laravel",
+  "kind": "laravel",
+  "bootstrap": [
+    "composer install --no-interaction --prefer-dist"
+  ],
+  "build": [
+    "npm ci --no-audit --no-fund || npm install --no-audit --no-fund",
+    "npm run build"
+  ],
+  "test": [
+    "php artisan test"
+  ],
+  "start": "php artisan serve --host=127.0.0.1 --port=8137",
+  "port": 8137,
+  "readinessPath": "/"
+}
