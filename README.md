@@ -4,6 +4,7 @@ Portal lowongan kerja untuk UMKM Indonesia — mirip JobStreet/KitaLulus tetapi 
 
 - **Stack:** Laravel 10 · PHP ≥ 8.1 · Blade · Tailwind (build Vite) · Alpine.js · SQLite/MySQL
 - **Repo:** private (`diluviumm/loker-umkm`)
+- **Demo publik:** <https://loker.naygars.site> (Cloudflare Tunnel → laptop, `loker-umkm.service`)
 - **Sumber awal:** `2411102441058-blip/pkl` (commit `b864841`)
 
 ---
@@ -14,7 +15,7 @@ Portal lowongan kerja untuk UMKM Indonesia — mirip JobStreet/KitaLulus tetapi 
 |---|---|
 | **Super Admin** | Login di `/admin/login`, memoderasi semua loker (setujui/tolak), menetapkan premium, menghapus loker, melihat data & dokumen pemilik usaha |
 | **Pemilik Usaha** | Daftar sekali, melengkapi profil usaha, memasang loker, memantau status, menutup/menghapus/memperpanjang loker |
-| **Pelamar** | Daftar (opsional), login via email atau **OTP WhatsApp**, menyimpan loker favorit, melamar via WhatsApp |
+| **Pelamar** | Daftar (opsional), login via email atau **OTP WhatsApp**, profil + CV (PDF), menyimpan loker favorit, melamar via WhatsApp |
 | **Publik / tamu** | Mencari & memfilter loker, melihat detail, menyimpan loker di browser (localStorage), melamar via WhatsApp — tanpa login |
 
 Alur inti: pemilik usaha memasang loker → status `pending` → admin meninjau (dan memverifikasi bukti bayar bila premium) → `aktif` 30 hari → otomatis `kadaluarsa` setelah lewat masa tayang.
@@ -86,6 +87,7 @@ Semua dokumen (selfie+KTP, SIM, bukti bayar) disimpan di **disk privat**, bukan 
 | GET/POST | `/usaha/pasang-loker` | auth + role pemilik | Form & simpan loker |
 | POST | `/usaha/loker/{job}/close\|renew` · DELETE | auth + role pemilik | Tutup / perpanjang / hapus |
 | GET | `/pelamar/dashboard` | auth + role pelamar | Loker tersimpan |
+| GET/POST | `/pelamar/profil` | auth + role pelamar | Profil pelamar + CV (PDF) |
 | POST/DELETE | `/pelamar/simpan/{job}` | auth + role pelamar | Simpan / hapus loker |
 | GET | `/admin/login` · `/admin/dashboard` | guest / auth + super_admin | Login & moderasi |
 | POST | `/admin/loker/{job}/approve\|reject\|toggle-premium` | auth + super_admin | Keputusan admin |
@@ -142,7 +144,7 @@ Isi `FONNTE_TOKEN` (dan `FONNTE_URL` bila self-host) di `.env`. Tanpa token:
 php artisan test
 ```
 
-**38 test / 99 assertion** mencakup: loker pending & kedaluwarsa tidak bocor, urutan premium, counter klik, otorisasi role (3 role), aturan persetujuan premium, validasi selfie+KTP, bukti bayar, pendaftaran pelamar, simpan/hapus loker, OTP WhatsApp (kirim/verifikasi/kedaluwarsa), dan akses dokumen privat (pemilik/admin/tamu/path traversal).
+**44 test / 117 assertion** mencakup: loker pending & kedaluwarsa tidak bocor, urutan premium, counter klik, otorisasi role (3 role), aturan persetujuan premium, validasi selfie+KTP, bukti bayar, pendaftaran pelamar, simpan/hapus loker, OTP WhatsApp (kirim/verifikasi/kedaluwarsa), dan akses dokumen privat (pemilik/admin/tamu/path traversal).
 
 ---
 
@@ -153,3 +155,20 @@ php artisan test
 3. **Fonnte** — kode OTP siap, tinggal isi token & verifikasi pengiriman nyata.
 4. **Retensi dokumen** — belum ada kebijakan hapus otomatis untuk selfie+KTP/bukti bayar.
 5. **Seeder produksi** — jalankan `php artisan db:seed --class=ProductionSeeder` dengan `ADMIN_EMAIL`/`ADMIN_PASSWORD`; jangan pakai kredensial demo.
+
+---
+
+## 10. Deployment (demo publik)
+
+| Komponen | Detail |
+|---|---|
+| URL | `https://loker.naygars.site` (wildcard `*.naygars.site` → Cloudflare Tunnel) |
+| App server | `systemd --user` unit **`loker-umkm.service`** → `php artisan serve 127.0.0.1:8123` (4 worker CLI) |
+| Scheduler | **`loker-umkm-scheduler.timer`** tiap menit → `php artisan schedule:run` (auto-kadaluarsa harian) |
+| Tunnel | entri `loker.naygars.site → http://localhost:8123` di `~/.cloudflared/config.yml` (sebelum wildcard) |
+| Env produksi | `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `SESSION_SECURE_COOKIE=true`, `ALLOW_DEMO_SEED=true` |
+| Cache | `php artisan optimize` (config + route). **Setiap ubah kode → `php artisan optimize` + restart service** |
+| Proxy | `TrustProxies = *` + `URL::forceScheme('https')` agar aset tidak mixed-content |
+| Header | HSTS, nosniff, frame-options, referrer-policy, permissions-policy, tanpa `X-Powered-By` |
+
+Catatan: `php artisan serve` cocok untuk demo/PKL. Untuk produksi nyata, ganti ke php-fpm + nginx/Caddy dan matikan `ALLOW_DEMO_SEED`.

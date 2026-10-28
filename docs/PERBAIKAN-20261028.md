@@ -142,3 +142,53 @@ Setiap butir menyebut file dan alasan.
 - Audit browser 17 kombinasi halaman × viewport: **0 overflow, 0 console error, 0 gambar rusak, 0 respons ≥ 400**.
 - E2E Playwright: pilih role pelamar → daftar → simpan loker → hapus → login OTP WhatsApp → dashboard pemilik; dokumen tanpa login → redirect. Semua lulus.
 - `composer audit`: 5 advisory (semua laravel/framework, sudah dimitigasi).
+---
+
+# Sesi 3 — deployment publik + audit produksi (29 Oktober 2026)
+
+## L. Deployment
+
+| Item | Hasil |
+|---|---|
+| Domain | **https://loker.naygars.site** (wildcard `*.naygars.site` → Cloudflare Tunnel, sudah ada) |
+| Ingress tunnel | entri `loker.naygars.site → http://localhost:8123` **sebelum** wildcard (urutan ingress menentukan) |
+| App service | `systemd --user loker-umkm.service` (auto-restart, 4 worker CLI) |
+| Scheduler | `loker-umkm-scheduler.timer` tiap menit → `php artisan schedule:run` |
+| Env | produksi: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `SESSION_SECURE_COOKIE=true`, `ALLOW_DEMO_SEED=true` |
+| HTTPS | `TrustProxies=*`, `URL::forceScheme('https')`, HTTP→HTTPS 301 di edge |
+| Header | HSTS, nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy, tanpa `X-Powered-By` |
+| Aset | `@vite` + `npm run build`; CSS/JS publik 200, tanpa mixed-content |
+
+## M. Bug/temuan baru saat deployment (dan perbaikannya)
+
+| # | Temuan | Perbaikan |
+|---|---|---|
+| M1 | Cloudflare menyuntik `static.cloudflareinsights.com` ke HTML → 1 console error di semua halaman | `Cache-Control: no-transform` untuk HTML → beacon hilang (diverifikasi 0 kemunculan) |
+| M2 | Header `X-Powered-By: PHP/8.5.12` membocorkan versi PHP | `header_remove('X-Powered-By')` di `public/index.php` + middleware |
+| M3 | Halaman error masih tampilan bawaan Laravel (Inggris, tidak konsisten) | 5 halaman error branded: 403/404/419/429/500 |
+| M4 | Pesan OTP di produksi menyebut "kode dicatat di log" padahal produksi tidak mencatat kode | Pesan dibedakan: lokal = kode demo, produksi tanpa token = "layanan OTP belum aktif" |
+| M5 | `phpunit` bisa memakai cache config/route produksi → test berisiko menyentuh DB produksi | `APP_CONFIG_CACHE` & `APP_ROUTES_CACHE` dipisah di `phpunit.xml` |
+| M6 | Seeder demo tidak bisa dipakai di produksi | guard `ALLOW_DEMO_SEED` + `ProductionSeeder` (admin dari ENV) |
+| M7 | Throttle login 5/menit terlalu ketat untuk IP bersama (NAT) | login 10/menit; admin login tetap 5/menit; OTP kirim 3/menit |
+| M8 | Icon `fa-compass` pada 404 tampak kosong di screenshot | diganti `fa-map-location-dot`; setelah diverifikasi, ikon tampil (yang lama sebenarnya *screenshot artifact* — font belum termuat) |
+| M9 | Data uji E2E menumpuk di DB produksi | dibersihkan (4 user + 4 file privat dihapus) |
+
+## N. Fitur yang dieksekusi dari daftar "belum"
+
+| # | Item | Hasil |
+|---|---|---|
+| N1 | Profil pelamar (J4) | Tabel `seeker_profiles` (headline, kota, keahlian, CV PDF), halaman `/pelamar/profil`, CV privat + otorisasi, tautan di dashboard |
+| N2 | Notifikasi WhatsApp status loker (J5) | `WhatsAppGateway` dipakai OTP + notifikasi approve/reject; tanpa token → log lokal, produksi hanya warning |
+| N3 | Retensi dokumen (J6) | **Belum** — butuh kebijakan pemilik data (lihat daftar sisa) |
+| N4 | Payment gateway (J1) | **Belum** — butuh akun merchant |
+| N5 | Upgrade Laravel (J2) | **Belum** — pekerjaan terpisah (Laravel 10 EOL, 5 advisory) |
+| N6 | Token Fonnte (J3) | **Belum** — kode siap, tinggal isi `FONNTE_TOKEN` |
+
+## O. Verifikasi sesi 3
+
+- `php artisan test` → **44 passed / 117 assertions**.
+- Audit browser **18 kombinasi** halaman × viewport di **domain publik**: 0 overflow, 0 console error, 0 respons ≥ 400.
+- Audit kontras: 0 pelanggaran pada latar solid (sisa hanya elemen bergradien).
+- E2E publik: daftar pelamar → simpan/hapus loker → profil + CV (HTTP 200) → OTP (pesan graceful tanpa token) → dokumen tanpa login redirect.
+- HTTP: `/` 200, detail aktif 200, **pending 404**, `/login-wa` 200, `/admin/login` 200, HTTP→HTTPS 301.
+- `composer audit`: tetap 5 advisory (laravel/framework, sudah dimitigasi).
