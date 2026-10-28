@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\JobStatusMail;
 use App\Models\JobListing;
+use App\Services\WhatsAppGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -11,6 +12,10 @@ use Illuminate\Support\Facades\Mail;
 
 class AdminDashboardController extends Controller
 {
+    public function __construct(private WhatsAppGateway $whatsapp)
+    {
+    }
+
     /**
      * Tampilkan form login Admin.
      */
@@ -200,6 +205,24 @@ class AdminDashboardController extends Controller
                 'error'  => $e->getMessage(),
             ]);
         }
+
+        // Notifikasi WhatsApp (opsional, memakai Fonnte bila token tersedia).
+        $phone = $job->user?->phone ?? $job->user?->businessProfile?->no_hp;
+
+        if ($phone) {
+            $this->whatsapp->send($phone, $this->statusMessage($job, $status));
+        }
+    }
+
+    private function statusMessage(JobListing $job, string $status): string
+    {
+        $url = route('jobs.show', $job->slug);
+
+        return match ($status) {
+            'approved_premium' => "Halo {$job->user?->name}, loker *{$job->posisi}* di {$job->nama_usaha} sudah DISETUJUI sebagai PREMIUM dan tayang 30 hari. Lihat: {$url}",
+            'approved_gratis'  => "Halo {$job->user?->name}, loker *{$job->posisi}* di {$job->nama_usaha} sudah DISETUJUI dan tayang 30 hari. Lihat: {$url}",
+            default            => "Halo {$job->user?->name}, mohon maaf loker *{$job->posisi}* di {$job->nama_usaha} DITOLAK oleh admin. Silakan perbaiki dan ajukan ulang.",
+        };
     }
 
     private function redirectByRole()

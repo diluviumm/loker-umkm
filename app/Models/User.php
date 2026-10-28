@@ -69,6 +69,11 @@ class User extends Authenticatable
         return $this->hasMany(JobListing::class);
     }
 
+    public function seekerProfile()
+    {
+        return $this->hasOne(SeekerProfile::class);
+    }
+
     public function savedJobs()
     {
         return $this->belongsToMany(JobListing::class, 'saved_jobs')

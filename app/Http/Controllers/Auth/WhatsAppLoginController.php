@@ -44,13 +44,13 @@ class WhatsAppLoginController extends Controller
 
         $request->session()->put('otp_phone', $result['phone']);
 
-        $message = $result['sent']
-            ? 'Kode OTP sudah dikirim ke WhatsApp Anda.'
-            : 'Fonnte belum dikonfigurasi, jadi kode OTP dicatat di log server.';
-
-        // Mode demo lokal: tampilkan kode agar alur bisa diuji tanpa Fonnte.
-        if (! $result['sent'] && app()->environment('local') && $result['code']) {
-            $message .= ' Kode demo: ' . $result['code'];
+        if ($result['sent']) {
+            $message = 'Kode OTP sudah dikirim ke WhatsApp Anda.';
+        } elseif (app()->environment('local', 'testing') && $result['code']) {
+            // Mode demo lokal: tampilkan kode agar alur bisa diuji tanpa Fonnte.
+            $message = 'Fonnte belum dikonfigurasi. Kode demo: ' . $result['code'];
+        } else {
+            $message = 'Layanan OTP WhatsApp belum aktif. Silakan masuk dengan email & password.';
         }
 
         return back()->with('success', $message);

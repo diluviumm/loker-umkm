@@ -18,7 +18,8 @@ class DocumentController extends Controller
         abort_unless(
             str_starts_with($path, 'private/')
             || str_starts_with($path, 'dokumen/')
-            || str_starts_with($path, 'pembayaran/'),
+            ||            str_starts_with($path, 'pembayaran/')
+            || str_starts_with($path, 'private/cv/'),
             404
         );
 
@@ -33,7 +34,8 @@ class DocumentController extends Controller
 
         $allowed = $user->isSuperAdmin()
             || in_array($path, $ownDocuments, true)
-            || $user->jobListings()->where('bukti_pembayaran', $path)->exists();
+            || $user->jobListings()->where('bukti_pembayaran', $path)->exists()
+            || ($user->seekerProfile?->cv_path === $path);
 
         abort_unless($allowed, 403);
 

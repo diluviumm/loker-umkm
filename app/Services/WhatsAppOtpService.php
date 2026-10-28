@@ -5,27 +5,19 @@ namespace App\Services;
 use App\Models\OtpCode;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class WhatsAppOtpService
 {
+    public function __construct(private WhatsAppGateway $gateway)
+    {
+    }
+
     /**
      * Normalisasi nomor ke format 62xxxxxxxxxx.
      */
     public function normalize(string $phone): string
     {
-        $digits = preg_replace('/[^0-9]/', '', $phone);
-
-        if (str_starts_with($digits, '0')) {
-            return '62' . substr($digits, 1);
-        }
-
-        if (str_starts_with($digits, '8')) {
-            return '62' . $digits;
-        }
-
-        return $digits;
+        return $this->gateway->normalize($phone);
     }
 
     /**
@@ -69,7 +61,8 @@ class WhatsAppOtpService
             'ip'         => request()->ip(),
         ]);
 
-        $sent = $this->send($normalized, $code);
+        $message = "Kode OTP Info Loker UMKM: {$code}. Berlaku 5 menit. Jangan bagikan kode ini kepada siapa pun.";
+        $sent = $this->gateway->send($normalized, $message);
 
         return ['user' => $user, 'phone' => $normalized, 'sent' => $sent, 'throttled' => false, 'code' => $code];
     }
@@ -98,55 +91,4 @@ class WhatsAppOtpService
         return User::where('phone', $normalized)->first();
     }
 
-    /**
-     * Kirim via Fonnte; bila token belum diisi, kode dicatat ke log (driver log).
-     */
-    private function send(string $phone, string $code): bool
-    {
-        $token = config('services.fonnte.token');
-        $message = "Kode OTP Info Loker UMKM: {$code}. Berlaku 5 menit. Jangan bagikan kode ini kepada siapa pun.";
-
-        if (! $token) {
-            if (app()->environment('local', 'testing')) {
-                // Hanya di lokal: kode ditulis agar alur bisa diuji tanpa Fonnte.
-                Log::info('OTP driver log (FONNTE_TOKEN belum diisi).', [
-                    'phone' => $phone,
-                    'code'  => $code,
-                ]);
-            } else {
-                Log::warning('FONNTE_TOKEN belum diisi — OTP tidak terkirim.', [
-                    'phone' => $phone,
-                ]);
-            }
-
-            return false;
-        }
-
-        try {
-            $response = Http::withHeaders(['Authorization' => $token])
-                ->asForm()
-                ->timeout(10)
-                ->post(config('services.fonnte.url'), [
-                    'target'  => $phone,
-                    'message' => $message,
-                ]);
-
-            if (! $response->successful()) {
-                Log::warning('Fonnte menolak permintaan OTP', [
-                    'phone'  => $phone,
-                    'status' => $response->status(),
-                    'body'   => $response->body(),
-                ]);
-            }
-
-            return $response->successful();
-        } catch (\Throwable $e) {
-            Log::warning('Gagal mengirim OTP via Fonnte', [
-                'phone' => $phone,
-                'error' => $e->getMessage(),
-            ]);
-
-            return false;
-        }
-    }
 }

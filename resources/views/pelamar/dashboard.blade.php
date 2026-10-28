@@ -16,10 +16,18 @@
                         · <i class="fa-brands fa-whatsapp mr-1"></i>{{ $user->phone }}
                     @endif
                 </p>
+                @if($user->seekerProfile?->headline)
+                    <p class="text-emerald-50 font-semibold text-xs mt-1"><i class="fa-solid fa-id-badge mr-1"></i>{{ $user->seekerProfile->headline }}</p>
+                @endif
             </div>
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-emerald-700 font-bold rounded-xl hover:bg-emerald-50 transition-all text-xs">
-                <i class="fa-solid fa-magnifying-glass"></i> Cari Loker Baru
-            </a>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('pelamar.profile.edit') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/20 text-white font-bold rounded-xl hover:bg-white/30 border border-white/40 transition-all text-xs">
+                    <i class="fa-solid fa-id-badge"></i> Profil Saya
+                </a>
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-emerald-700 font-bold rounded-xl hover:bg-emerald-50 transition-all text-xs">
+                    <i class="fa-solid fa-magnifying-glass"></i> Cari Loker Baru
+                </a>
+            </div>
         </div>
     </div>
 
