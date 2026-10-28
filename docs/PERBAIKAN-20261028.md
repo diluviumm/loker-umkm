@@ -62,3 +62,19 @@ Setiap butir menyebut file dan alasan.
 - Semua file PHP lolos `php -l`; semua Blade lolos `php artisan view:cache`.
 - Smoke test HTTP: `/` 200, detail aktif 200, **detail pending 404**, `/admin/reset-admin-password` 404, aset 200.
 - Verifikasi visual: screenshot desktop 1440px & mobile 390px untuk beranda, detail, login, register, dashboard usaha, form loker, profil, admin.
+
+## F. Polish setelah audit visual (browser + kontras)
+
+| # | Temuan | Perbaikan | File |
+|---|---|---|---|
+| F1 | Tanggal tampil bahasa Inggris ("3 days ago", "26 Oct 2026") | `APP_LOCALE=id` + `Carbon::setLocale()` + `translatedFormat()` | `config/app.php`, `AppServiceProvider`, `jobs/show`, `admin/dashboard`, `emails` |
+| F2 | Teks putih pada gradient pink-500->rose-500 hanya ~3.9:1 (gagal WCAG AA) | Gradient digelapkan ke pink-600->rose-600 (sekitar 5.0-5.6:1) | `layouts`, `home`, `auth/*`, `business/*`, `admin/*` |
+| F3 | Teks sekunder `slate-400` (2.56:1) dan pink-500 kecil (3.53:1) | Dinaikkan ke `slate-500/600` dan `pink-600` | `layouts`, `home`, `jobs/show`, `auth/*` |
+| F4 | Login admin: teks opacity 0.2-0.45 dan blob memicu scroll horizontal 80px | Opacity dinaikkan + `overflow-x: hidden` + `background-color` fallback | `admin/login.blade.php` |
+| F5 | Chip kategori terpotong di desktop (scroll horizontal tanpa petunjuk) | Wrap otomatis di layar >= lg, ukuran chip diringkas | `home.blade.php` |
+| F6 | Tombol ikon (mata/gembok/perpanjang/hapus) target sentuh ~30px | Padding diperbesar + `aria-label` | `business/dashboard.blade.php` |
+| F7 | Tombol nonaktif hanya dibedakan warna | Ikon kunci saat nonaktif + tooltip alasan + catatan status pembayaran | `admin/dashboard.blade.php` |
+| F8 | Tombol "Logout Admin" duplikat dengan menu "Keluar" dan jargon "FASE 2" | Dihapus / diganti label ramah pengguna | `admin/dashboard.blade.php` |
+| F9 | Data demo semuanya tampil "baru saja" | Seeder memberi umur 1-7 hari pada 7 loker contoh | `database/seeders/DatabaseSeeder.php` |
+
+**Bukti verifikasi visual:** 14 kombinasi halaman x viewport (1440 & 390) -> `overflowX = 0`, tanpa console error, tanpa gambar rusak, tanpa respons >= 400. Audit kontras otomatis: 0 pelanggaran pada latar solid (sisa temuan hanya elemen bergradien yang tidak dapat dihitung skrip).
