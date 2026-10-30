@@ -1,10 +1,10 @@
 # Info Loker UMKM
 
-Portal lowongan kerja untuk UMKM Indonesia — mirip JobStreet/KitaLulus tetapi khusus usaha mikro, kecil, dan menengah. Pelamar melihat loker tanpa perlu akun, lalu melamar **langsung via WhatsApp** ke pemilik usaha.
+Portal lowongan kerja **khusus UMKM Kalimantan Timur** — mirip JobStreet/KitaLulus tetapi fokus usaha mikro, kecil, dan menengah di Kaltim. Tamu bisa melihat daftar loker, tetapi **nomor WhatsApp pemilik usaha hanya terbuka setelah membuat akun pelamar** (gratis, cukup email + password).
 
-- **Stack:** Laravel 10 · PHP ≥ 8.1 · Blade · Tailwind (build Vite) · Alpine.js · SQLite/MySQL
-- **Repo:** private (`diluviumm/loker-umkm`)
-- **Demo publik:** <https://loker.naygars.site> (Cloudflare Tunnel → laptop, `loker-umkm.service`)
+- **Stack:** Laravel 12 · PHP ≥ 8.2 · Blade · Tailwind (build Vite) · Alpine.js · SQLite/MySQL
+- **Repo publik:** `diluviumm/loker-umkm` · **backup privat:** `diluviumm/loker-umkm-backup`
+- **Live:** <https://loker.naygars.site> (Cloudflare Tunnel → server `dilu`, PHP-FPM 8.3 + Caddy)
 - **Sumber awal:** `2411102441058-blip/pkl` (commit `b864841`)
 
 ---
@@ -15,10 +15,22 @@ Portal lowongan kerja untuk UMKM Indonesia — mirip JobStreet/KitaLulus tetapi 
 |---|---|
 | **Super Admin** | Login di `/admin/login`, memoderasi semua loker (setujui/tolak), menetapkan premium, menghapus loker, melihat data & dokumen pemilik usaha |
 | **Pemilik Usaha** | Daftar sekali, melengkapi profil usaha, memasang loker, memantau status, menutup/menghapus/memperpanjang loker |
-| **Pelamar** | Daftar (opsional), login via email atau **OTP WhatsApp**, profil + CV (PDF), menyimpan loker favorit, melamar via WhatsApp |
-| **Publik / tamu** | Mencari & memfilter loker, melihat detail, menyimpan loker di browser (localStorage), melamar via WhatsApp — tanpa login |
+| **Pelamar** | Daftar dengan **email + password** (tanpa nomor HP), melihat kontak WhatsApp pemilik usaha, menyimpan loker, mengunggah CV, melamar via WhatsApp |
+| **Publik / tamu** | Mencari & memfilter loker Kaltim, melihat detail dan gaji — **tombol WhatsApp terkunci** sampai membuat akun pelamar |
 
 Alur inti: pemilik usaha memasang loker → status `pending` → admin meninjau (dan memverifikasi bukti bayar bila premium) → `aktif` 30 hari → otomatis `kadaluarsa` setelah lewat masa tayang.
+
+### Pendaftaran & akses kontak WhatsApp
+
+| Jalur | Isian | Hasil |
+|---|---|---|
+| `/daftar/pelamar` | nama, email, password | langsung masuk dashboard pelamar |
+| `/daftar/usaha` | nama, email, nomor WhatsApp, password | verifikasi OTP Fonnte bila token aktif; tanpa token akun tetap dibuat dan admin memverifikasi manual |
+| Tamu di detail loker | — | nomor WA disamarkan `••••`, tombol menjadi **Buat akun untuk lihat WA** |
+| Pelamar login | — | nomor WA asli + tombol **Lamar via WhatsApp**; klik tercatat di statistik |
+| Admin `/admin/pengguna` | — | daftar pendaftar pelamar & pemilik usaha + statistik kunjungan/klik |
+
+Wilayah layanan dibatasi **Kalimantan Timur** (`config/wilayah.php`, 10 kota/kabupaten); form pasang loker menolak lokasi di luar daftar itu.
 
 ---
 
@@ -144,7 +156,7 @@ Isi `FONNTE_TOKEN` (dan `FONNTE_URL` bila self-host) di `.env`. Tanpa token:
 php artisan test
 ```
 
-**44 test / 117 assertion** mencakup: loker pending & kedaluwarsa tidak bocor, urutan premium, counter klik, otorisasi role (3 role), aturan persetujuan premium, validasi selfie+KTP, bukti bayar, pendaftaran pelamar, simpan/hapus loker, OTP WhatsApp (kirim/verifikasi/kedaluwarsa), dan akses dokumen privat (pemilik/admin/tamu/path traversal).
+**59 test / 166 assertion** mencakup: loker pending & kedaluwarsa tidak bocor, urutan premium, counter klik (wajib login), otorisasi role, aturan persetujuan premium, validasi selfie+KTP, bukti bayar, pendaftaran pelamar (email+password) dan pemilik usaha (WA wajib), kunci kontak WA untuk tamu, whitelist lokasi Kalimantan Timur, halaman traffic admin, simpan/hapus loker, OTP WhatsApp, retensi dokumen, dan akses dokumen privat.
 
 ---
 
@@ -162,8 +174,8 @@ php artisan test
 
 | Remote | Repo | Fungsi |
 |---|---|---|
-| `origin` | `diluviumm/loker-umkm` (**private**) | backup utama, sumber kebenaran |
-| `public` | `diluviumm/loker-umkm-public` (**public**) | mirror publik untuk dibagikan |
+| `origin` | `diluviumm/loker-umkm-backup` (**private**) | backup, sumber kebenaran |
+| `public` | `diluviumm/loker-umkm` (**public**) | repo publik (utama, dibagikan) |
 | `upstream` | `2411102441058-blip/pkl` | sumber asli (read-only) |
 
 Setiap perubahan **wajib** dikirim ke keduanya:
@@ -190,14 +202,20 @@ Setiap perubahan **wajib** dikirim ke keduanya:
 | Proxy | `TrustProxies = *` + `URL::forceScheme('https')` agar aset tidak mixed-content |
 | Header | HSTS, nosniff, frame-options, referrer-policy, permissions-policy, tanpa `X-Powered-By` |
 
-Alur deploy ulang:
+Alur deploy ulang (jangan pernah menyinkronkan `bootstrap/cache` — cache dev memuat
+Collision yang tidak terpasang di server):
 
 ```bash
 rsync -az --delete --exclude .git --exclude vendor --exclude node_modules \
       --exclude 'database/*.sqlite*' --exclude 'storage/app/private/***' \
-      --exclude .env --exclude public/build ./ server:/srv/loker-umkm/
-rsync -az public/build/ server:/srv/loker-umkm/public/build/
-ssh server 'cd /srv/loker-umkm && composer install --no-dev -o && php artisan migrate --force && php artisan optimize'
+      --exclude 'storage/logs/***' --exclude 'storage/framework/***' \
+      --exclude 'bootstrap/cache/***' --exclude .env --exclude public/build \
+      ./ server:/srv/loker-umkm/
+rsync -az --delete public/build/ server:/srv/loker-umkm/public/build/
+ssh server 'bash ~/scripts/deploy-loker.sh'
 ```
+
+`~/scripts/deploy-loker.sh` di server: hapus cache config/route, `composer install --no-dev`,
+`package:discover`, `migrate --force`, `optimize`, lalu `loker-fix-perms.sh`.
 
 Izin wajib (sekali): `storage/` & `bootstrap/cache` grup `www-data` + `g+rwX`, dan **`database/` + `database.sqlite` harus bisa ditulis `www-data`** (SQLite menulis jurnal di folder yang sama).

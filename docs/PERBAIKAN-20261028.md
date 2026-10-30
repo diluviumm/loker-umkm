@@ -273,3 +273,68 @@ Bug yang muncul saat pindah host (dan perbaikannya):
 - Login admin dengan password hasil rotasi → **/admin/dashboard**.
 - Header produksi: HSTS, nosniff, X-Frame-Options, Referrer-Policy, `Cache-Control: no-transform`, tanpa `X-Powered-By`.
 - Portal: kartu `loker` tampil di desktop & mobile, dialog berisi URL yang benar.
+---
+
+# Sesi 5 — fokus Kalimantan Timur, registrasi terpisah, kontak WA terkunci (31 Oktober 2026)
+
+## V. Repo GitHub
+
+| Sebelum | Sesudah | Visibilitas |
+|---|---|---|
+| `diluviumm/loker-umkm` | **`diluviumm/loker-umkm-backup`** | private (backup) |
+| `diluviumm/loker-umkm-public` | **`diluviumm/loker-umkm`** | **public (utama)** |
+
+Remote lokal: `origin` → repo backup, `public` → repo publik. `bin/ship.sh` tetap mengirim ke keduanya.
+
+## W. Fokus wilayah Kalimantan Timur
+
+| Area | Perubahan |
+|---|---|
+| Sumber daftar | `config/wilayah.php` — 10 kota/kabupaten Kaltim |
+| Beranda | filter lokasi jadi `<select>` (bukan input bebas), hero/badge/title menyebut Kaltim |
+| Pasang loker | lokasi `<select>` + validasi `in:` (menolak kota luar Kaltim) |
+| Seeder | 7 loker contoh tersebar di Samarinda, Balikpapan, Bontang, Kutai Kartanegara, Berau, Penajam Paser Utara |
+| Profil usaha | alamat contoh Samarinda |
+
+## X. Registrasi dipisah
+
+| URL | Isian | Perilaku |
+|---|---|---|
+| `/daftar` | — | halaman pilih: Pelamar / Pemilik Usaha |
+| `/daftar/pelamar` | nama, email, password, setuju T&C | **tanpa nomor HP**, langsung masuk dashboard pelamar |
+| `/daftar/usaha` | nama, email, **nomor WhatsApp**, password | OTP Fonnte bila token aktif; tanpa token akun dibuat + catatan verifikasi manual |
+| `/daftar/usaha/verifikasi` | 6 digit | verifikasi + kirim ulang (throttle 3/menit) |
+
+Kolom baru: `users.phone_verified_at`. Password minimum 8 karakter. View lama (`auth/register.blade.php`) dipensiunkan ke `legacy/`.
+
+## Y. Kontak WhatsApp terkunci untuk tamu
+
+| Lokasi | Tamu | Pelamar login |
+|---|---|---|
+| Detail loker (hero) | tombol **Buat akun untuk lihat WA** | tombol **Lamar via WhatsApp** |
+| Panel CTA | ajakan buat akun + link masuk | tombol kirim lamaran |
+| Sidebar | nomor disamarkan `•••• •••• ••••` | nomor asli |
+| Kartu beranda | tombol **Buka WA** (mengarah ke daftar) | tombol **Lamar WA** |
+| `POST /loker/{job}/track-click` | 401 (wajib login) | menambah counter |
+
+## Z. Traffic pendaftar di admin
+
+`/admin/pengguna` — statistik (akun pelamar, pemilik usaha, pendaftar 7 hari, WA terverifikasi, total kunjungan/klik), filter peran + pencarian nama/email/HP, tabel desktop dan kartu mobile, pagination 20. Tautan tersedia di header dashboard moderasi.
+
+## AA. Bug yang ditemukan saat eksekusi (dan perbaikannya)
+
+| # | Gejala | Akar masalah | Perbaikan |
+|---|---|---|---|
+| 1 | Tombol submit tidak terlihat, kolom form selebar 66px | `public/build` baru tidak ikut ter-rsync → CSS lama tanpa `lg:col-span-7` | rsync `public/build` setiap deploy (masuk prosedur) |
+| 2 | `php artisan` di server error `CollisionServiceProvider not found` | `bootstrap/cache/packages.php` dari laptop (dev) ikut tersinkron | exclude `bootstrap/cache/***` + `package:discover` di `deploy-loker.sh` |
+| 3 | Password admin kembali `password123` setelah reseed | `DatabaseSeeder` menulis password hardcode | pakai `config('app.admin_password')` (ENV) |
+| 4 | Semua halaman 500 setelah deploy | SQLite & `storage/framework` tidak bisa ditulis `www-data` | `loker-fix-perms.sh` + dipanggil otomatis di akhir deploy |
+| 5 | Hapus loker tersimpan tidak berpindah halaman (E2E) | dialog `confirm()` memblokir navigasi pada harness | handler dialog di skrip E2E (bukan bug aplikasi) |
+
+## AB. Verifikasi sesi 5
+
+- `php artisan test` → **59 passed / 166 assertions**.
+- Audit browser **75 kombinasi** (15 halaman × 5 viewport 1440/1280/1024/768/390) → **0 error, 0 overflow horizontal**, DOM maksimal 432 node, median load 1,4 s.
+- E2E produksi: tamu terkunci → daftar pelamar → WA terbuka → simpan/hapus → profil + CV (200) → daftar usaha → admin traffic melihat keduanya; **0 console error**.
+- Keamanan: HTML tamu tidak memuat `wa.me`/nomor (0 kemunculan), `track-click` 401 tanpa login, `/admin/pengguna` 403 untuk pelamar.
+- Server: Laravel 12.70.2, deploy via `~/scripts/deploy-loker.sh`, backup harian 03:20.

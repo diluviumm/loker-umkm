@@ -9,3 +9,5 @@ File di folder ini **tidak di-autoload** dan **tidak dirutekan**. Disimpan hanya
 
 Form pengganti: `/usaha/pasang-loker` (middleware `auth` + `role:pemilik_usaha`).
 | `welcome.blade.php.txt` | `resources/views/welcome.blade.php` | Halaman sambutan bawaan Laravel. Tidak pernah dirender karena `/` diarahkan ke `HomeController`. |
+
+| `auth-register-unified.blade.php.txt` | `resources/views/auth/register.blade.php` | Form daftar gabungan (radio role + WA wajib). Diganti dua halaman terpisah: `/daftar/pelamar` (email+password) dan `/daftar/usaha` (WA + OTP). |
