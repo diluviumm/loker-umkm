@@ -36,7 +36,7 @@ class AdminModerationTest extends TestCase
             'posisi'           => 'Kasir',
             'slug'             => 'kasir-warung-test',
             'deskripsi'        => 'Melayani pelanggan dan mengelola transaksi harian.',
-            'lokasi'           => 'Bandung',
+            'lokasi'           => 'Samarinda',
             'tipe_pekerjaan'   => 'Full Time',
             'nomor_wa'         => '081234567890',
             'status'           => 'pending',

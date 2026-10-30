@@ -25,7 +25,7 @@ class PelamarFlowTest extends TestCase
             'posisi'         => 'Kasir',
             'slug'           => 'kasir-warung-test',
             'deskripsi'      => 'Melayani pelanggan dan mengelola transaksi harian.',
-            'lokasi'         => 'Bandung',
+            'lokasi'         => 'Samarinda',
             'tipe_pekerjaan' => 'Full Time',
             'nomor_wa'       => '6281234567890',
             'status'         => 'aktif',
@@ -35,23 +35,30 @@ class PelamarFlowTest extends TestCase
         ]);
     }
 
-    public function test_pendaftaran_pelamar_diarahkan_ke_dashboard_pelamar(): void
+    public function test_pendaftaran_pelamar_cukup_email_dan_password(): void
     {
-        $this->post('/daftar', [
+        $this->post('/daftar/pelamar', [
             'name'                  => 'Rina Pencari Kerja',
             'email'                 => 'rina@example.test',
-            'phone'                 => '081234500011',
-            'role'                  => 'pelamar',
             'password'              => 'rahasia123',
             'password_confirmation' => 'rahasia123',
+            'terms'                 => '1',
         ])->assertRedirect('/pelamar/dashboard');
 
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => 'rina@example.test',
-            'phone' => '6281234500011',
+            'phone' => null,
             'role'  => 'pelamar',
         ]);
+    }
+
+    public function test_halaman_daftar_menawarkan_dua_jenis_akun(): void
+    {
+        $this->get('/daftar')
+            ->assertOk()
+            ->assertSee('Daftar sebagai pelamar')
+            ->assertSee('Daftar sebagai pemilik usaha');
     }
 
     public function test_pelamar_bisa_menyimpan_dan_menghapus_loker(): void

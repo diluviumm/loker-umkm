@@ -67,7 +67,7 @@ class BusinessFlowTest extends TestCase
             'category_id'    => $category->id,
             'posisi'         => 'Barista',
             'deskripsi'      => str_repeat('Membuat minuman kopi. ', 3),
-            'lokasi'         => 'Bandung',
+            'lokasi'         => 'Samarinda',
             'tipe_pekerjaan' => 'Full Time',
             'is_premium'     => '1',
         ])->assertSessionHasErrors('bukti_pembayaran');
@@ -91,7 +91,7 @@ class BusinessFlowTest extends TestCase
             'category_id'      => $category->id,
             'posisi'           => 'Barista',
             'deskripsi'        => str_repeat('Membuat minuman kopi. ', 3),
-            'lokasi'           => 'Bandung',
+            'lokasi'           => 'Samarinda',
             'tipe_pekerjaan'   => 'Full Time',
             'is_premium'       => '1',
             'bukti_pembayaran' => UploadedFile::fake()->image('bukti.jpg'),
@@ -114,7 +114,7 @@ class BusinessFlowTest extends TestCase
             'category_id'    => $category->id,
             'posisi'         => 'Barista',
             'deskripsi'      => str_repeat('Membuat minuman kopi. ', 3),
-            'lokasi'         => 'Bandung',
+            'lokasi'         => 'Samarinda',
             'tipe_pekerjaan' => 'Full Time',
         ])->assertRedirect('/usaha/profil');
 

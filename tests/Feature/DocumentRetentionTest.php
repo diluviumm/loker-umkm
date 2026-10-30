@@ -29,7 +29,7 @@ class DocumentRetentionTest extends TestCase
             'posisi'         => 'Kasir',
             'slug'           => 'kasir-warung-uji-'.uniqid(),
             'deskripsi'      => 'Melayani pembeli dan menjaga kebersihan warung.',
-            'lokasi'         => 'Bandung',
+            'lokasi'         => 'Samarinda',
             'tipe_pekerjaan' => 'Full Time',
             'nomor_wa'       => '6281234500099',
             'status'         => $status,
@@ -107,7 +107,7 @@ class DocumentRetentionTest extends TestCase
         JobListing::create([
             'user_id' => $owner->id, 'category_id' => $category->id, 'nama_usaha' => 'Toko Budi',
             'posisi' => 'Kasir', 'slug' => 'kasir-toko-budi', 'deskripsi' => 'Menjaga kasir dan stok toko.',
-            'lokasi' => 'Bandung', 'tipe_pekerjaan' => 'Full Time', 'nomor_wa' => '6281234500077',
+            'lokasi' => 'Samarinda', 'tipe_pekerjaan' => 'Full Time', 'nomor_wa' => '6281234500077',
             'status' => 'aktif',
         ]);
 

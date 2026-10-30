@@ -19,7 +19,7 @@ class SeekerProfileTest extends TestCase
 
         $this->actingAs($pelamar)->post('/pelamar/profil', [
             'headline' => 'Barista 2 tahun',
-            'city'     => 'Bandung',
+            'city'     => 'Samarinda',
             'skills'   => 'Manual brew, kasir, stok harian.',
             'cv'       => UploadedFile::fake()->create('cv.pdf', 120, 'application/pdf'),
         ])->assertRedirect('/pelamar/dashboard');

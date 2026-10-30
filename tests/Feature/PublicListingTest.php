@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\JobListing;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -27,7 +28,7 @@ class PublicListingTest extends TestCase
             'posisi'         => 'Kasir',
             'slug'           => 'kasir-warung-test',
             'deskripsi'      => 'Melayani pelanggan dan mengelola transaksi harian.',
-            'lokasi'         => 'Bandung',
+            'lokasi'         => 'Samarinda',
             'tipe_pekerjaan' => 'Full Time',
             'nomor_wa'       => '081234567890',
             'status'         => 'aktif',
@@ -81,11 +82,31 @@ class PublicListingTest extends TestCase
             ->assertSeeInOrder(['Loker Premium', 'Loker Gratis']);
     }
 
+    public function test_track_click_butuh_login(): void
+    {
+        $job = JobListing::create([
+            'category_id'    => Category::firstOrCreate(['slug' => 'kuliner'], ['nama' => 'Kuliner', 'icon' => 'fa-utensils'])->id,
+            'nama_usaha'     => 'Warung Test',
+            'posisi'         => 'Kasir',
+            'slug'           => 'kasir-warung-track-guard',
+            'deskripsi'      => 'Melayani pelanggan dan mengelola transaksi harian.',
+            'lokasi'         => 'Samarinda',
+            'tipe_pekerjaan' => 'Full Time',
+            'nomor_wa'       => '6281234567890',
+            'status'         => 'aktif',
+            'approved_at'    => now(),
+            'expires_at'     => now()->addDays(30),
+        ]);
+
+        $this->postJson("/loker/{$job->id}/track-click")->assertUnauthorized();
+    }
+
     public function test_track_click_ditolak_untuk_loker_tidak_aktif(): void
     {
         $job = $this->job(['slug' => 'loker-pending', 'status' => 'pending']);
 
-        $this->postJson("/loker/{$job->id}/track-click")->assertStatus(422);
+        $this->actingAs(User::factory()->pelamar()->create())
+            ->postJson("/loker/{$job->id}/track-click")->assertStatus(422);
 
         $this->assertSame(0, $job->fresh()->clicks_count);
     }
@@ -94,7 +115,8 @@ class PublicListingTest extends TestCase
     {
         $job = $this->job(['slug' => 'loker-aktif']);
 
-        $this->postJson("/loker/{$job->id}/track-click")
+        $this->actingAs(User::factory()->pelamar()->create())
+            ->postJson("/loker/{$job->id}/track-click")
             ->assertOk()
             ->assertJson(['success' => true, 'clicks_count' => 1]);
 
