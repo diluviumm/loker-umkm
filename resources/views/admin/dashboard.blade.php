@@ -14,7 +14,9 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold mt-2 tracking-tight">Dashboard Verifikasi Lowongan Kerja</h1>
                 <p class="text-sm text-slate-700 font-semibold mt-1">Kelola permohonan loker pending, setujui status Gratis/Premium, atau tolak loker tidak layak.</p>
             </div>
-            
+            <a href="{{ route('admin.users') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-amber-900 font-bold rounded-xl border-2 border-amber-300 hover:bg-amber-50 transition-all text-xs sm:text-sm">
+                <i class="fa-solid fa-users"></i> Pengguna &amp; Traffic
+            </a>
         </div>
     </div>
 </div>

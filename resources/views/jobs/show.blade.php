@@ -56,11 +56,21 @@
             <!-- Quick Contact -->
             <div class="bg-white/95 backdrop-blur-md p-5 rounded-2xl border border-pink-200 flex flex-col items-center shrink-0 text-center shadow-lg max-w-sm w-full lg:w-auto">
                 <span class="text-xs text-slate-600 font-semibold">Lamar pekerjaan ini</span>
-                <a href="{{ $job->wa_link }}" target="_blank" rel="noopener" data-track-job="{{ $job->id }}"
-                   class="mt-3 inline-flex items-center gap-2 px-5 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-600/30 transition-all w-full justify-center">
-                    <i class="fa-brands fa-whatsapp text-xl"></i>
-                    <span>Lamar via WhatsApp</span>
-                </a>
+
+                @auth
+                    <a href="{{ $job->wa_link }}" target="_blank" rel="noopener" data-track-job="{{ $job->id }}"
+                       class="mt-3 inline-flex items-center gap-2 px-5 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-600/30 transition-all w-full justify-center">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                        <span>Lamar via WhatsApp</span>
+                    </a>
+                @else
+                    <a href="{{ route('register.pelamar') }}"
+                       class="mt-3 inline-flex items-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm rounded-xl shadow-md transition-all w-full justify-center">
+                        <i class="fa-solid fa-lock text-amber-300"></i>
+                        <span>Buat akun untuk lihat WA</span>
+                    </a>
+                    <p class="text-[10px] text-slate-500 font-semibold mt-2">Gratis · cukup email &amp; password</p>
+                @endauth
 
                 <div class="flex items-center gap-2 w-full mt-3">
                     @php
@@ -162,13 +172,22 @@
                 <div class="mt-8 p-6 bg-gradient-to-r from-pink-50 via-rose-50 to-pink-50 rounded-2xl border border-pink-200 text-center">
                     <h3 class="text-base font-extrabold text-pink-950">Tertarik mengisi posisi ini?</h3>
                     <p class="text-sm text-pink-800 font-medium mt-1 max-w-lg mx-auto">
-                        Klik tombol di bawah untuk membuka WhatsApp dengan pesan lamaran otomatis ke pemilik usaha.
+                        Kontak WhatsApp pemilik usaha hanya terbuka untuk pelamar yang sudah punya akun.
                     </p>
-                    <a href="{{ $job->wa_link }}" target="_blank" rel="noopener" data-track-job="{{ $job->id }}"
-                       class="inline-flex items-center gap-2.5 mt-4 px-6 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-600/30 transition-all">
-                        <i class="fa-brands fa-whatsapp text-2xl"></i>
-                        <span>Kirim Lamaran Sekarang (WA)</span>
-                    </a>
+                    @auth
+                        <a href="{{ $job->wa_link }}" target="_blank" rel="noopener" data-track-job="{{ $job->id }}"
+                           class="inline-flex items-center gap-2.5 mt-4 px-6 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-600/30 transition-all">
+                            <i class="fa-brands fa-whatsapp text-2xl"></i>
+                            <span>Kirim Lamaran Sekarang (WA)</span>
+                        </a>
+                    @else
+                        <a href="{{ route('register.pelamar') }}"
+                           class="inline-flex items-center gap-2.5 mt-4 px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+                            <i class="fa-solid fa-lock text-amber-300"></i>
+                            <span>Buat Akun Pelamar (Gratis)</span>
+                        </a>
+                        <p class="text-[11px] text-pink-900/70 font-semibold mt-2">Sudah punya akun? <a href="{{ route('login') }}" class="underline font-extrabold">Masuk</a></p>
+                    @endauth
                 </div>
 
             </article>
@@ -210,7 +229,14 @@
 
                 <div>
                     <span class="text-slate-500 font-bold text-[10px] uppercase tracking-wider block">Nomor WhatsApp</span>
-                    <span class="font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block mt-1">{{ $job->nomor_wa }}</span>
+                    @auth
+                        <span class="font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block mt-1">{{ $job->nomor_wa }}</span>
+                    @else
+                        <span class="font-mono font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 inline-block mt-1 select-none">•••• •••• ••••</span>
+                        <a href="{{ route('register.pelamar') }}" class="block text-[10px] font-bold text-pink-600 hover:text-pink-700 mt-1">
+                            <i class="fa-solid fa-lock mr-1"></i>Buat akun untuk membuka
+                        </a>
+                    @endauth
                 </div>
 
                 <div class="flex items-center gap-3 pt-2 border-t border-slate-100 text-xs font-semibold text-slate-500">

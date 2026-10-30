@@ -27,7 +27,8 @@ class DatabaseSeeder extends Seeder
                 'name'     => 'Admin Utama',
                 'email'    => 'admin@loker.com',
                 'phone'    => '6281100000001',
-                'password' => Hash::make('password123'),
+                // Di produksi demo, pakai password dari ENV (jangan pernah default publik).
+                'password' => Hash::make(config('app.admin_password') ?: 'password123'),
                 'role'     => 'super_admin',
             ]
         );
@@ -51,7 +52,7 @@ class DatabaseSeeder extends Seeder
                 'nama_pemilik'     => 'Sari Pemilik',
                 'nama_usaha'       => 'Kopi Sejahtera UMKM',
                 'no_hp'            => '6281234567890',
-                'alamat_usaha'     => 'Bandung, Jawa Barat',
+                'alamat_usaha'     => 'Samarinda, Kalimantan Timur',
                 'kategori_usaha'   => 'Kuliner & F&B',
                 'deskripsi_usaha'  => 'Kedai kopi kekinian yang menjual berbagai varian minuman kopi dan non-kopi.',
                 'medsos_instagram' => '@kopisejahtera',
@@ -83,8 +84,8 @@ class DatabaseSeeder extends Seeder
         $catMarketing = Category::where('slug', 'marketing-medsos')->first();
         $catRetail = Category::where('slug', 'retail-toko')->first();
 
-        // 4. Sample Job Listings di berbagai daerah Indonesia
-        // Premium Active Job 1 - Bandung
+        // 4. Sample Job Listings — UMKM Kalimantan Timur
+        // Premium Active Job 1 - Samarinda
         JobListing::updateOrCreate(
             ['slug' => 'barista-staff-kopi-sejahtera'],
             [
@@ -94,7 +95,7 @@ class DatabaseSeeder extends Seeder
                 'posisi'         => 'Barista & Staff Service',
                 'deskripsi'      => "Dibutuhkan Barista ramah dan cekatan untuk Kedai Kopi Sejahtera.\n\nTugas:\n- Membuat minuman berbasis kopi.\n- Melayani pembeli dengan ramah.\n- Menjaga kebersihan area.",
                 'syarat'         => "1. Pria/Wanita max 25 tahun\n2. Pendidikan min. SMA/SMK\n3. Jujur & komunikatif.",
-                'lokasi'         => 'Bandung, Jawa Barat',
+                'lokasi'         => 'Samarinda',
                 'tipe_pekerjaan' => 'Full Time',
                 'gaji'           => 'Rp 2.500.000 - Rp 3.200.000',
                 'nomor_wa'       => '081234567890',
@@ -105,7 +106,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Premium Active Job 2 - IT Freelance Remote / Jakarta
+        // Premium Active Job 2 - IT / Balikpapan
         JobListing::updateOrCreate(
             ['slug' => 'web-developer-freelance-tokoku'],
             [
@@ -114,7 +115,7 @@ class DatabaseSeeder extends Seeder
                 'posisi'         => 'Web Developer (Laravel/Vue)',
                 'deskripsi'      => "Mencari Web Developer freelance untuk pembuatan landing page dan sistem kasir online UMKM.",
                 'syarat'         => "1. Menguasai PHP Laravel & HTML/CSS\n2. Punya portofolio website\n3. Siap kerja deadline.",
-                'lokasi'         => 'Jakarta Selatan (Remote)',
+                'lokasi'         => 'Balikpapan',
                 'tipe_pekerjaan' => 'Freelance',
                 'gaji'           => 'Rp 3.500.000 - Rp 5.000.000 / Project',
                 'nomor_wa'       => '081399887766',
@@ -125,7 +126,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Guru Privat / Les - Yogyakarta
+        // Guru Privat / Les - Bontang
         JobListing::updateOrCreate(
             ['slug' => 'guru-les-privat-sd-smp-bimbel-cerdas'],
             [
@@ -134,7 +135,7 @@ class DatabaseSeeder extends Seeder
                 'posisi'         => 'Guru Les Privat Matematika & Bahasa Inggris',
                 'deskripsi'      => "Dibutuhkan Pengajar/Guru honorer atau mahasiswa untuk mengajar privat siswa SD & SMP.",
                 'syarat'         => "1. Mahasiswa / Lulusan S1 Pendidikan\n2. Sabar dan menyukai anak-anak\n3. Domisili Jogja.",
-                'lokasi'         => 'Yogyakarta',
+                'lokasi'         => 'Bontang',
                 'tipe_pekerjaan' => 'Part Time',
                 'gaji'           => 'Rp 1.500.000 - Rp 2.200.000',
                 'nomor_wa'       => '085712345678',
@@ -154,7 +155,7 @@ class DatabaseSeeder extends Seeder
                 'posisi'         => 'Staff Akuntansi & Pembukuan',
                 'deskripsi'      => "Mencari staff akuntansi teliti untuk mengelola keuangan harian, laporan laba rugi, dan perpajakan dasar.",
                 'syarat'         => "1. Lulusan D3/S1 Akuntansi\n2. Mahir Ms. Excel & software akuntansi\n3. Pengalaman min. 1 tahun.",
-                'lokasi'         => 'Surabaya, Jawa Timur',
+                'lokasi'         => 'Kutai Kartanegara',
                 'tipe_pekerjaan' => 'Full Time',
                 'gaji'           => 'Rp 3.000.000 - Rp 4.000.000',
                 'nomor_wa'       => '081987654321',
@@ -174,7 +175,7 @@ class DatabaseSeeder extends Seeder
                 'posisi'         => 'Kasir & Admin Toko',
                 'deskripsi'      => "Lowongan Kasir toko fashion online & offline.",
                 'syarat'         => "1. Wanita max 25 tahun\n2. Penampilan menarik & ramah\n3. Domisili Medan.",
-                'lokasi'         => 'Medan, Sumatera Utara',
+                'lokasi'         => 'Berau',
                 'tipe_pekerjaan' => 'Full Time',
                 'gaji'           => 'Rp 2.200.000',
                 'nomor_wa'       => '082166554433',
@@ -194,7 +195,7 @@ class DatabaseSeeder extends Seeder
                 'posisi'         => 'Freelance Content Creator & Designer',
                 'deskripsi'      => "Membuat konten promosi berupa foto & video pendek untuk Instagram villa & cafe.",
                 'syarat'         => "1. Punya HP/Kamera mendukung\n2. Kreatif & menguasai CapCut/Canva\n3. Domisili Bali.",
-                'lokasi'         => 'Denpasar, Bali',
+                'lokasi'         => 'Penajam Paser Utara',
                 'tipe_pekerjaan' => 'Freelance',
                 'gaji'           => 'Rp 2.000.000 - Rp 3.500.000',
                 'nomor_wa'       => '081299001122',
@@ -214,7 +215,7 @@ class DatabaseSeeder extends Seeder
                 'posisi'         => 'Staff Gudang & Packing',
                 'deskripsi'      => 'Melakukan packing produk keripik dan penataan stok barang di gudang.',
                 'syarat'         => 'Pria, fisik kuat, siap kerja shift.',
-                'lokasi'         => 'Semarang, Jawa Tengah',
+                'lokasi'         => 'Samarinda',
                 'tipe_pekerjaan' => 'Full Time',
                 'gaji'           => 'Rp 2.200.000',
                 'nomor_wa'       => '087711223344',

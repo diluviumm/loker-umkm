@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\JobStatusMail;
 use App\Models\JobListing;
+use App\Models\User;
 use App\Services\WhatsAppGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -116,6 +117,44 @@ class AdminDashboardController extends Controller
      * - Belum bayar → wajib Gratis (tombol premium tidak tersedia di UI,
      *   dan parameter is_premium dari request diabaikan/ditolak).
      */
+    /**
+     * Traffic pendaftar: siapa yang mendaftar sebagai pelamar dan pemilik usaha.
+     */
+    public function users(Request $request)
+    {
+        $role = (string) $request->input('role', '');
+        $q = trim((string) $request->input('q', ''));
+        $allowed = ['pelamar', 'pemilik_usaha', 'super_admin'];
+
+        $users = User::query()
+            ->when(in_array($role, $allowed, true), fn ($query) => $query->where('role', $role))
+            ->when($q !== '', function ($query) use ($q) {
+                $needle = '%' . addcslashes($q, '%_\\') . '%';
+                $query->where(function ($sub) use ($needle) {
+                    $sub->where('name', 'like', $needle)
+                        ->orWhere('email', 'like', $needle)
+                        ->orWhere('phone', 'like', $needle);
+                });
+            })
+            ->withCount(['jobListings', 'savedJobs'])
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $stats = [
+            'pelamar'         => User::where('role', 'pelamar')->count(),
+            'pemilik'         => User::where('role', 'pemilik_usaha')->count(),
+            'pelamar_baru'    => User::where('role', 'pelamar')->where('created_at', '>=', now()->subDays(7))->count(),
+            'pemilik_baru'    => User::where('role', 'pemilik_usaha')->where('created_at', '>=', now()->subDays(7))->count(),
+            'wa_terverifikasi' => User::whereNotNull('phone_verified_at')->count(),
+            'wa_belum'        => User::where('role', 'pemilik_usaha')->whereNull('phone_verified_at')->count(),
+            'total_views'     => (int) JobListing::sum('views_count'),
+            'total_clicks'    => (int) JobListing::sum('clicks_count'),
+        ];
+
+        return view('admin.users', compact('users', 'stats', 'role', 'q'));
+    }
+
     public function approve(Request $request, JobListing $job)
     {
         $paidPremium = $job->hasPaidPremium();

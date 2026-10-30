@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Info Loker UMKM - Cari Lowongan Kerja Terpercaya & Terbaru')
+@section('title', 'Info Loker UMKM Kalimantan Timur - Lowongan Kerja Terbaru')
 
 @section('content')
 
@@ -11,16 +11,16 @@
     <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 border border-pink-300 text-pink-700 text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">
-            <i class="fa-solid fa-circle-check text-amber-500"></i> Platform Lowongan Kerja UMKM Terverifikasi
+            <i class="fa-solid fa-map-location-dot text-amber-500"></i> Khusus UMKM Kalimantan Timur
         </div>
 
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 max-w-4xl mx-auto leading-tight">
-            Temukan Pekerjaan Impian &amp; Hubungi UMKM
-            <span class="bg-gradient-to-r from-pink-600 via-rose-600 to-pink-500 bg-clip-text text-transparent">Langsung via WhatsApp</span>
+            Lowongan Kerja UMKM Kalimantan Timur,
+            <span class="bg-gradient-to-r from-pink-600 via-rose-600 to-pink-500 bg-clip-text text-transparent">Lamar Langsung via WhatsApp</span>
         </h1>
 
         <p class="mt-4 text-sm sm:text-base lg:text-lg text-slate-700 max-w-2xl mx-auto font-medium leading-relaxed">
-            Lowongan kerja lokal tanpa ribet. Tanpa CV rumit — lamar ke pemilik usaha hanya dengan satu klik via WhatsApp.
+            Lowongan kerja UMKM di Samarinda, Balikpapan, Bontang, dan seluruh Kalimantan Timur. Tanpa CV rumit — lamar langsung ke pemilik usaha via WhatsApp.
         </p>
 
         <!-- Search -->
@@ -62,25 +62,16 @@
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-pink-400">
                         <i class="fa-solid fa-location-dot text-sm"></i>
                     </div>
-                    <input type="text" id="lokasi" name="lokasi" value="{{ request('lokasi') }}" list="kota-indonesia" placeholder="Lokasi di Indonesia..."
-                        class="w-full pl-10 pr-3 py-2.5 bg-pink-50/60 hover:bg-pink-50 focus:bg-white border border-pink-200 rounded-xl text-sm font-semibold text-slate-900 placeholder-slate-500 focus:ring-4 focus:ring-pink-200 focus:border-pink-400 outline-none transition-all">
-                    <datalist id="kota-indonesia">
-                        <option value="Jakarta"></option>
-                        <option value="Bandung"></option>
-                        <option value="Surabaya"></option>
-                        <option value="Yogyakarta"></option>
-                        <option value="Semarang"></option>
-                        <option value="Medan"></option>
-                        <option value="Bali"></option>
-                        <option value="Malang"></option>
-                        <option value="Makassar"></option>
-                        <option value="Palembang"></option>
-                        <option value="Tangerang"></option>
-                        <option value="Bekasi"></option>
-                        <option value="Bogor"></option>
-                        <option value="Depok"></option>
-                        <option value="Solo"></option>
-                    </datalist>
+                    <select id="lokasi" name="lokasi"
+                        class="w-full pl-10 pr-8 py-2.5 bg-pink-50/60 hover:bg-pink-50 focus:bg-white border border-pink-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-4 focus:ring-pink-200 focus:border-pink-400 outline-none transition-all appearance-none cursor-pointer">
+                        <option value="">Semua Kaltim</option>
+                        @foreach(config('wilayah.kota') as $kota)
+                            <option value="{{ $kota }}" {{ request('lokasi') === $kota ? 'selected' : '' }}>{{ $kota }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-pink-400 text-xs">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
                 </div>
 
                 <!-- Submit -->
@@ -209,11 +200,19 @@
                         <a href="{{ route('jobs.show', $job->slug) }}" class="py-2.5 px-3 bg-white hover:bg-pink-100/60 text-pink-950 text-xs font-bold rounded-lg border border-pink-200 text-center transition-colors">
                             Detail
                         </a>
-                        <a href="{{ $job->wa_link }}" target="_blank" rel="noopener" data-track-job="{{ $job->id }}"
-                           class="inline-flex items-center justify-center gap-2 py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow-sm shadow-emerald-600/30 transition-all">
-                            <i class="fa-brands fa-whatsapp text-sm"></i>
-                            <span>Lamar WA</span>
-                        </a>
+                        @auth
+                            <a href="{{ $job->wa_link }}" target="_blank" rel="noopener" data-track-job="{{ $job->id }}"
+                               class="inline-flex items-center justify-center gap-2 py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow-sm shadow-emerald-600/30 transition-all">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                                <span>Lamar WA</span>
+                            </a>
+                        @else
+                            <a href="{{ route('register.pelamar') }}"
+                               class="inline-flex items-center justify-center gap-2 py-2.5 px-3 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg shadow-sm transition-all">
+                                <i class="fa-solid fa-lock text-amber-300 text-sm"></i>
+                                <span>Buka WA</span>
+                            </a>
+                        @endauth
                     </div>
 
                 </article>

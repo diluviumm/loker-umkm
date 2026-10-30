@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/loker/{slug}', [JobDetailController::class, 'show'])->name('jobs.show');
 Route::post('/loker/{job}/track-click', [JobTrackController::class, 'trackClick'])
-    ->middleware('throttle:30,1')
+    ->middleware(['auth', 'throttle:30,1'])
     ->name('jobs.track-click');
 
 // ─── AUTH: Login & Register ────────────────────────────────────────────
@@ -35,10 +35,26 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:10,1')
         ->name('login.post');
 
-    Route::get('/daftar', [AuthController::class, 'registerForm'])->name('register');
-    Route::post('/daftar', [AuthController::class, 'register'])
+    // Daftar dipisah: pelamar (email+password) vs pemilik usaha (WA + verifikasi).
+    Route::get('/daftar', [AuthController::class, 'chooseForm'])->name('register');
+
+    Route::get('/daftar/pelamar', [AuthController::class, 'pelamarForm'])->name('register.pelamar');
+    Route::post('/daftar/pelamar', [AuthController::class, 'registerPelamar'])
         ->middleware('throttle:5,1')
-        ->name('register.post');
+        ->name('register.pelamar.post');
+
+    Route::get('/daftar/usaha', [AuthController::class, 'usahaForm'])->name('register.usaha');
+    Route::post('/daftar/usaha', [AuthController::class, 'registerUsaha'])
+        ->middleware('throttle:5,1')
+        ->name('register.usaha.post');
+
+    Route::get('/daftar/usaha/verifikasi', [AuthController::class, 'usahaVerifyForm'])->name('register.usaha.verify');
+    Route::post('/daftar/usaha/verifikasi', [AuthController::class, 'usahaVerify'])
+        ->middleware('throttle:10,1')
+        ->name('register.usaha.verify.post');
+    Route::post('/daftar/usaha/kirim-ulang', [AuthController::class, 'resendUsahaOtp'])
+        ->middleware('throttle:3,1')
+        ->name('register.usaha.resend');
 
     // Login via WhatsApp (OTP Fonnte)
     Route::get('/login-wa', [WhatsAppLoginController::class, 'showForm'])->name('login.wa');
@@ -78,6 +94,7 @@ Route::middleware(['auth', 'role:pelamar'])->prefix('pelamar')->name('pelamar.')
 // ─── ADMIN ─────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/pengguna', [AdminDashboardController::class, 'users'])->name('users');
     Route::post('/loker/{job}/approve', [AdminDashboardController::class, 'approve'])->name('jobs.approve');
     Route::post('/loker/{job}/reject', [AdminDashboardController::class, 'reject'])->name('jobs.reject');
     Route::post('/loker/{job}/toggle-premium', [AdminDashboardController::class, 'togglePremium'])->name('jobs.toggle-premium');

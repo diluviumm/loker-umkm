@@ -102,7 +102,7 @@
                             </a>
                         @endif
                     @else
-                        <a href="{{ route('register') }}" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-xl shadow-md shadow-pink-500/30 transition-all">
+                        <a href="{{ route('register.usaha') }}" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-xl shadow-md shadow-pink-500/30 transition-all">
                             <i class="fa-solid fa-plus-circle"></i>
                             <span class="hidden sm:inline">Pasang Loker</span>
                         </a>
@@ -198,7 +198,8 @@
                     <h4 class="text-xs font-bold text-pink-400 uppercase tracking-widest">Navigasi</h4>
                     <ul class="space-y-2 text-sm font-semibold">
                         <li><a href="{{ route('home') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Cari Lowongan</a></li>
-                        <li><a href="{{ route('register') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Pasang Loker UMKM</a></li>
+                        <li><a href="{{ route('register.usaha') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Pasang Loker UMKM</a></li>
+                        <li><a href="{{ route('register.pelamar') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Daftar Akun Pelamar</a></li>
                         <li><a href="{{ route('login') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Login Akun</a></li>
                         <li><a href="{{ route('admin.login') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Login Admin</a></li>
                     </ul>
