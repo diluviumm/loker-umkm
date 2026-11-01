@@ -321,7 +321,7 @@
     </style>
 </head>
 <body>
-    <div class="shell">
+    <main class="shell">
         <div class="card">
             <!-- Logo & Title -->
             <div class="logo-area">
@@ -394,6 +394,6 @@
             <i class="fa-solid fa-shield-halved"></i>
             <span>Halaman ini dienkripsi dan dilindungi. Akses tidak sah akan dicatat.</span>
         </p>
-    </div>
+    </main>
 </body>
 </html>

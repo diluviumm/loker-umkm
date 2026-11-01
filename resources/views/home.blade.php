@@ -1,6 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Info Loker UMKM Kalimantan Timur - Lowongan Kerja Terbaru')
+@section('description', 'Cari lowongan kerja UMKM di Samarinda, Balikpapan, Bontang, dan seluruh Kalimantan Timur. Lamar langsung via WhatsApp setelah membuat akun pelamar gratis.')
+
+@section('meta')
+    <meta property="og:site_name" content="LokerUMKM Kaltim">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Lowongan Kerja UMKM Kalimantan Timur">
+    <meta property="og:description" content="Lowongan UMKM di Samarinda, Balikpapan, Bontang, dan seluruh Kaltim. Lamar langsung via WhatsApp.">
+    <meta property="og:url" content="{{ route('home') }}">
+    <meta property="og:image" content="{{ asset('images/og-default.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+@endsection
 
 @section('content')
 

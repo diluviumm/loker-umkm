@@ -53,11 +53,11 @@
 
                 <label class="flex items-start gap-2 text-xs font-semibold text-slate-600">
                     <input type="checkbox" name="terms" value="1" required class="mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
-                    <span>Saya menyetujui syarat & ketentuan serta kebijakan privasi LokerUMKM Kaltim.</span>
+                    <span>Saya menyetujui <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener" class="text-emerald-700 font-bold underline">syarat &amp; ketentuan</a> serta <a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener" class="text-emerald-700 font-bold underline">kebijakan privasi</a> LokerUMKM Kaltim.</span>
                 </label>
                 @error('terms')<p class="text-rose-600 text-xs font-bold">{{ $message }}</p>@enderror
 
-                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-md shadow-emerald-600/25 transition-all text-sm">
+                <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold rounded-xl shadow-md shadow-emerald-600/25 transition-all text-sm">
                     <i class="fa-solid fa-user-plus mr-1.5"></i> Buat Akun Pelamar
                 </button>
             </form>

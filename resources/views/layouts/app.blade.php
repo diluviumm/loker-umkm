@@ -5,7 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Info Loker UMKM - Portal Lowongan Kerja Terpercaya')</title>
-    @yield('meta')
+    <meta name="description" content="@yield('description', 'Portal lowongan kerja UMKM Kalimantan Timur. Temukan lowongan di Samarinda, Balikpapan, Bontang, dan kota lainnya, lalu lamar langsung via WhatsApp.')">
+    <meta name="theme-color" content="#db2777">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    @hasSection('meta')
+        @yield('meta')
+    @else
+        <meta property="og:site_name" content="LokerUMKM Kaltim">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="@yield('title', 'Info Loker UMKM Kalimantan Timur')">
+        <meta property="og:description" content="@yield('description', 'Portal lowongan kerja UMKM Kalimantan Timur.')">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:image" content="{{ asset('images/og-default.png') }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta name="twitter:card" content="summary_large_image">
+    @endif
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,17 +61,17 @@
 
                     @auth
                         @if(auth()->user()->isSuperAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 transition-all border border-amber-300 inline-flex items-center gap-2">
+                            <a href="{{ route('admin.dashboard') }}" aria-label="Dashboard Admin" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 transition-all border border-amber-300 inline-flex items-center gap-2">
                                 <i class="fa-solid fa-shield-halved text-amber-600"></i>
                                 <span class="hidden sm:inline">Dashboard Admin</span>
                             </a>
                         @elseif(auth()->user()->isPelamar())
-                            <a href="{{ route('pelamar.dashboard') }}" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 transition-all border border-emerald-300 inline-flex items-center gap-2">
+                            <a href="{{ route('pelamar.dashboard') }}" aria-label="Dashboard Pelamar" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 transition-all border border-emerald-300 inline-flex items-center gap-2">
                                 <i class="fa-solid fa-user text-emerald-600"></i>
                                 <span class="hidden sm:inline">Dashboard Pelamar</span>
                             </a>
                         @else
-                            <a href="{{ route('business.dashboard') }}" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-pink-700 bg-pink-100 hover:bg-pink-200 transition-all border border-pink-300 inline-flex items-center gap-2">
+                            <a href="{{ route('business.dashboard') }}" aria-label="Dashboard Saya" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-pink-700 bg-pink-100 hover:bg-pink-200 transition-all border border-pink-300 inline-flex items-center gap-2">
                                 <i class="fa-solid fa-store text-pink-500"></i>
                                 <span class="hidden sm:inline">Dashboard Saya</span>
                             </a>
@@ -96,13 +112,13 @@
                     <!-- Pasang Loker -->
                     @auth
                         @if(auth()->user()->isPemilikUsaha())
-                            <a href="{{ route('business.jobs.create') }}" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-xl shadow-md shadow-pink-500/30 transition-all">
+                            <a href="{{ route('business.jobs.create') }}" aria-label="Pasang Loker" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-xl shadow-md shadow-pink-500/30 transition-all">
                                 <i class="fa-solid fa-plus-circle"></i>
                                 <span class="hidden sm:inline">Pasang Loker</span>
                             </a>
                         @endif
                     @else
-                        <a href="{{ route('register.usaha') }}" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-xl shadow-md shadow-pink-500/30 transition-all">
+                        <a href="{{ route('register.usaha') }}" aria-label="Pasang Loker" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-xl shadow-md shadow-pink-500/30 transition-all">
                             <i class="fa-solid fa-plus-circle"></i>
                             <span class="hidden sm:inline">Pasang Loker</span>
                         </a>
@@ -195,18 +211,20 @@
                 </div>
 
                 <div class="md:col-span-3 space-y-3">
-                    <h4 class="text-xs font-bold text-pink-400 uppercase tracking-widest">Navigasi</h4>
+                    <p class="text-xs font-bold text-pink-400 uppercase tracking-widest">Navigasi</p>
                     <ul class="space-y-2 text-sm font-semibold">
                         <li><a href="{{ route('home') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Cari Lowongan</a></li>
                         <li><a href="{{ route('register.usaha') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Pasang Loker UMKM</a></li>
                         <li><a href="{{ route('register.pelamar') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Daftar Akun Pelamar</a></li>
+                        <li><a href="{{ route('legal.terms') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Syarat &amp; Ketentuan</a></li>
+                        <li><a href="{{ route('legal.privacy') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Kebijakan Privasi</a></li>
                         <li><a href="{{ route('login') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Login Akun</a></li>
                         <li><a href="{{ route('admin.login') }}" class="hover:text-pink-300 transition-colors"><i class="fa-solid fa-chevron-right text-[10px] text-pink-400 mr-1.5"></i>Login Admin</a></li>
                     </ul>
                 </div>
 
                 <div class="md:col-span-4 space-y-3">
-                    <h4 class="text-xs font-bold text-pink-400 uppercase tracking-widest">Fitur Unggulan</h4>
+                    <p class="text-xs font-bold text-pink-400 uppercase tracking-widest">Fitur Unggulan</p>
                     <ul class="space-y-2 text-sm font-semibold">
                         <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-pink-400"></i> Moderasi loker oleh admin</li>
                         <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-pink-400"></i> Prioritas loker premium</li>

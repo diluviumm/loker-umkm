@@ -15,7 +15,7 @@
 </head>
 <body class="min-h-full font-sans antialiased pink-gradient flex items-center justify-center p-4">
 
-    <div class="w-full max-w-sm">
+    <main class="w-full max-w-sm">
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center justify-center gap-3 mb-8 group">
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/40 group-hover:scale-105 transition-transform">
@@ -132,6 +132,6 @@
                 Pelamar bisa langsung cari loker tanpa akun. <a href="{{ route('home') }}" class="text-pink-600 font-black">Cari loker di beranda →</a>
             </p>
         </div>
-    </div>
+    </main>
 </body>
 </html>

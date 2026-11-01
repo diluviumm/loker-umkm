@@ -26,7 +26,7 @@
     <!-- Top Stat Cards Large -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <div class="bg-white p-4 rounded-2xl border border-pink-200 shadow-sm text-center">
-            <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Total Data</span>
+            <span class="text-xs font-black text-slate-600 uppercase tracking-wider">Total Data</span>
             <div class="text-2xl font-extrabold text-slate-900 mt-1">{{ $stats['total'] }}</div>
         </div>
 
@@ -64,7 +64,7 @@
                 <a href="{{ route('admin.dashboard', ['status' => 'semua']) }}" class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all {{ ! in_array($statusFilter, ['pending','aktif','ditolak','kadaluarsa'], true) ? 'bg-slate-900 text-white shadow-md' : 'bg-pink-50 text-slate-700 hover:bg-pink-100 border border-pink-200/60' }}">
                     <i class="fa-solid fa-list mr-1.5"></i> Semua ({{ $stats['total'] }})
                 </a>
-                <a href="{{ route('admin.dashboard', ['status' => 'pending']) }}" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all {{ $statusFilter == 'pending' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'bg-pink-50 text-slate-700 hover:bg-pink-100 border border-pink-200/60' }}">
+                <a href="{{ route('admin.dashboard', ['status' => 'pending']) }}" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all {{ $statusFilter == 'pending' ? 'bg-amber-700 text-white shadow-lg shadow-amber-700/30' : 'bg-pink-50 text-slate-700 hover:bg-pink-100 border border-pink-200/60' }}">
                     <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Loker Pending ({{ $stats['pending'] }})
                 </a>
                 <a href="{{ route('admin.dashboard', ['status' => 'aktif']) }}" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all {{ $statusFilter == 'aktif' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30' : 'bg-pink-50 text-slate-700 hover:bg-pink-100 border border-pink-200/60' }}">
@@ -127,9 +127,9 @@
                                 <span class="text-xs text-slate-500 font-semibold">Dikirim {{ $job->created_at->translatedFormat('d M Y H:i') }}</span>
                             </div>
 
-                            <h3 class="text-base sm:text-lg font-extrabold text-slate-900">
+                            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">
                                 {{ $job->posisi }} <span class="text-pink-700 font-bold text-base">at {{ $job->nama_usaha }}</span>
-                            </h3>
+                            </h2>
 
                             <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-700 font-bold pt-1">
                                 <span><i class="fa-solid {{ $job->category->icon ?? 'fa-briefcase' }} text-pink-500 mr-1.5"></i>{{ $job->category->nama ?? 'Umum' }}</span>
@@ -173,7 +173,7 @@
                                         <input type="hidden" name="is_premium" value="0">
                                         <button type="submit" @disabled($paidPremium)
                                             title="{{ $paidPremium ? 'Sudah dibayar — persetujuan gratis dinonaktifkan' : 'Setujui sebagai loker gratis' }}"
-                                            class="px-3.5 py-2.5 text-xs font-bold rounded-xl transition-all {{ $paidPremium ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm' }}">
+                                            class="px-3.5 py-2.5 text-xs font-bold rounded-xl transition-all {{ $paidPremium ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm' }}">
                                             <i class="fa-solid {{ $paidPremium ? 'fa-check' : 'fa-lock' }} mr-1"></i> Setujui Gratis
                                         </button>
                                     </form>
@@ -214,7 +214,7 @@
                                     @if($job->status != 'aktif')
                                         <form action="{{ route('admin.jobs.approve', $job->id) }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-2xl">
+                                            <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-black rounded-2xl">
                                                 Aktifkan Loker
                                             </button>
                                         </form>
@@ -393,7 +393,7 @@
                                                 @csrf
                                                 <input type="hidden" name="is_premium" value="0">
                                                 <button type="submit" @disabled($job->hasPaidPremium())
-                                                    class="px-3.5 py-2.5 font-bold rounded-xl text-xs {{ $job->hasPaidPremium() ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white' }}">
+                                                    class="px-3.5 py-2.5 font-bold rounded-xl text-xs {{ $job->hasPaidPremium() ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-emerald-700 hover:bg-emerald-800 text-white' }}">
                                                     <i class="fa-solid fa-check mr-1"></i> Setujui Gratis
                                                 </button>
                                             </form>

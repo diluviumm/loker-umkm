@@ -1,2 +1,9 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /login-wa
+Disallow: /daftar
+Disallow: /dokumen
+
+Sitemap: https://loker.naygars.site/sitemap.xml

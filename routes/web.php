@@ -8,6 +8,7 @@ use App\Http\Controllers\Business\JobPostController;
 use App\Http\Controllers\Business\ProfileController as BusinessProfile;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\JobDetailController;
 use App\Http\Controllers\JobTrackController;
 use App\Http\Controllers\Pelamar\DashboardController as PelamarDashboard;
@@ -23,6 +24,11 @@ use Illuminate\Support\Facades\Route;
 
 // ─── PUBLIC: Pelamar / Pengunjung (tidak perlu login) ──────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Halaman legal + sitemap (SEO)
+Route::view('/syarat-ketentuan', 'legal.syarat')->name('legal.terms');
+Route::view('/kebijakan-privasi', 'legal.privasi')->name('legal.privacy');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/loker/{slug}', [JobDetailController::class, 'show'])->name('jobs.show');
 Route::post('/loker/{job}/track-click', [JobTrackController::class, 'trackClick'])
     ->middleware(['auth', 'throttle:30,1'])

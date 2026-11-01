@@ -1,13 +1,21 @@
 @extends('layouts.app')
 
 @section('title', $job->posisi . ' - ' . $job->nama_usaha . ' | Info Loker UMKM')
+@section('description', Str::limit(strip_tags($job->deskripsi), 155))
 
 @section('meta')
     <meta property="og:title" content="{{ $job->posisi }} di {{ $job->nama_usaha }}">
     <meta property="og:description" content="{{ Str::limit(strip_tags($job->deskripsi), 150) }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ route('jobs.show', $job->slug) }}">
+    <meta property="og:site_name" content="LokerUMKM Kaltim">
     <meta property="og:image" content="{{ asset('images/og-default.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="id_ID">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $job->posisi }} di {{ $job->nama_usaha }}">
+    <meta name="twitter:description" content="{{ Str::limit(strip_tags($job->deskripsi), 150) }}">
 @endsection
 
 @section('content')
@@ -232,7 +240,7 @@
                     @auth
                         <span class="font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block mt-1">{{ $job->nomor_wa }}</span>
                     @else
-                        <span class="font-mono font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 inline-block mt-1 select-none">•••• •••• ••••</span>
+                        <span class="font-mono font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 inline-block mt-1 select-none">•••• •••• ••••</span>
                         <a href="{{ route('register.pelamar') }}" class="block text-[10px] font-bold text-pink-600 hover:text-pink-700 mt-1">
                             <i class="fa-solid fa-lock mr-1"></i>Buat akun untuk membuka
                         </a>

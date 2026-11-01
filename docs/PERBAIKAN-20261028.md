@@ -393,3 +393,51 @@ Verifikasi: `pdfinfo` 16 halaman A4, `pdftotext` memuat seluruh judul bagian & k
 semua halaman menghasilkan render non-kosong, dan pemeriksaan bounding-box tidak menemukan teks keluar margin.
 
 > Kredensial **hanya ada di PDF dan di server** (`~/.hermes/.secrets/`), tidak pernah masuk repositori.
+---
+
+# Sesi 7 — aksesibilitas, SEO, halaman legal, audit kasus tepi (1 November 2026)
+
+## AH. Aksesibilitas (axe-core, WCAG 2.1 AA + best-practice)
+
+| Temuan awal | Jumlah | Perbaikan |
+|---|---|---|
+| `color-contrast` | 5 halaman | emerald-600→700, amber-500→700, slate-400→600, blue-500→700, emerald-500→700 |
+| `heading-order` | 6 halaman | heading footer `<h4>`→`<p>`; judul kartu admin `<h3>`→`<h2>` |
+| `link-name` (mobile) | 4 halaman | `aria-label` pada link ikon: Pasang Loker (tamu & pemilik), Dashboard Admin/Pelamar/Saya |
+| `landmark-one-main` / `region` | login & admin-login | konten dibungkus `<main>` |
+
+**Hasil akhir:** 10 halaman × 2 viewport (1440 & 390) = **20 kombinasi, 0 pelanggaran**, 0 ID duplikat, 0 gambar tanpa `alt`.
+
+## AI. SEO & halaman legal
+
+| Item | Hasil |
+|---|---|
+| Meta description + canonical + theme-color | default di layout, dapat ditimpa per halaman |
+| Open Graph/Twitter | default + khusus beranda & detail loker (gambar 1200×630) |
+| `sitemap.xml` | dinamis: beranda, daftar, halaman legal, **hanya lowongan aktif** |
+| `robots.txt` | menolak `/admin`, `/login`, `/login-wa`, `/daftar`, `/dokumen`; mencantumkan sitemap |
+| Halaman legal | `/syarat-ketentuan` dan `/kebijakan-privasi`, ditautkan dari form pendaftaran (kedua jenis akun) dan footer |
+
+## AJ. Audit kasus tepi
+
+| Uji | Hasil |
+|---|---|
+| Email duplikat saat daftar | ditolak, pesan jelas |
+| Password < 8 karakter | ditolak |
+| Nomor WhatsApp duplikat | ditolak |
+| Judul lowongan berisi `<script>` | tersimpan & ditampilkan **ter-escape** (tidak ada tag aktif) |
+| Pencarian `% _ \` | 200, tanpa error SQL |
+| Pencarian tanpa hasil | menampilkan pesan kosong |
+| URL tidak ada | halaman 404 branded |
+| IDOR tutup/hapus loker milik pemilik lain | **403** |
+| Pelamar mencoba approve lowongan | **403** |
+| Rate limit login | 10 percobaan → **429** |
+| `og-default.png` | 200 |
+
+## AK. Verifikasi sesi 7
+
+- `php artisan test` → **63 passed / 184 assertions**.
+- QA fungsional produksi → **27/27 lulus**.
+- Audit visual 75 kombinasi → **0 masalah**; median 1,37 s · p95 2,24 s · maks 3,53 s.
+- Aksesibilitas 20 kombinasi → **0 pelanggaran**.
+- Data uji dibersihkan kembali ke 5 akun (3 demo + 2 akun nyata) dan 8 lowongan.

@@ -35,7 +35,7 @@
         <h2 class="text-lg font-extrabold text-slate-900">
             <i class="fa-solid fa-heart text-rose-500 mr-2"></i>Loker Tersimpan
         </h2>
-        <span class="text-xs font-bold text-slate-500">{{ $savedJobs->total() }} loker</span>
+        <span class="text-xs font-bold text-slate-600">{{ $savedJobs->total() }} loker</span>
     </div>
 
     @if($savedJobs->isEmpty())

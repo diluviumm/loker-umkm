@@ -48,7 +48,7 @@
             $statItems = [
                 ['label' => 'Total Loker', 'value' => $stats['total'], 'icon' => 'fa-briefcase', 'bg' => 'bg-slate-100', 'fg' => 'text-slate-600'],
                 ['label' => 'Aktif', 'value' => $stats['aktif'], 'icon' => 'fa-circle-check', 'bg' => 'bg-emerald-100', 'fg' => 'text-emerald-600'],
-                ['label' => 'Menunggu', 'value' => $stats['pending'], 'icon' => 'fa-clock', 'bg' => 'bg-amber-100', 'fg' => 'text-amber-600'],
+                ['label' => 'Menunggu', 'value' => $stats['pending'], 'icon' => 'fa-clock', 'bg' => 'bg-amber-100', 'fg' => 'text-amber-800'],
                 ['label' => 'Ditolak', 'value' => $stats['ditolak'], 'icon' => 'fa-circle-xmark', 'bg' => 'bg-rose-100', 'fg' => 'text-rose-600'],
                 ['label' => 'Kadaluarsa', 'value' => $stats['kadaluarsa'], 'icon' => 'fa-calendar-xmark', 'bg' => 'bg-slate-100', 'fg' => 'text-slate-500'],
                 ['label' => 'Premium', 'value' => $stats['premium'], 'icon' => 'fa-crown', 'bg' => 'bg-orange-100', 'fg' => 'text-orange-500'],
@@ -118,10 +118,10 @@
                                     <span><i class="fa-solid fa-location-dot text-pink-400 mr-1"></i>{{ $loker->lokasi }}</span>
                                     <span><i class="fa-solid fa-calendar text-pink-400 mr-1"></i>{{ $loker->created_at->diffForHumans() }}</span>
                                     @if($loker->expires_at && $loker->status === 'aktif')
-                                        <span class="text-amber-600"><i class="fa-solid fa-hourglass-half mr-1"></i>Berakhir {{ $loker->expires_at->translatedFormat('d M Y') }}</span>
+                                        <span class="text-amber-800"><i class="fa-solid fa-hourglass-half mr-1"></i>Berakhir {{ $loker->expires_at->translatedFormat('d M Y') }}</span>
                                     @endif
-                                    <span class="text-blue-500"><i class="fa-solid fa-eye mr-1"></i>{{ $loker->views_count }} dilihat</span>
-                                    <span class="text-emerald-500"><i class="fa-brands fa-whatsapp mr-1"></i>{{ $loker->clicks_count }} klik WA</span>
+                                    <span class="text-blue-700"><i class="fa-solid fa-eye mr-1"></i>{{ $loker->views_count }} dilihat</span>
+                                    <span class="text-emerald-700"><i class="fa-brands fa-whatsapp mr-1"></i>{{ $loker->clicks_count }} klik WA</span>
                                 </div>
                             </div>
 
