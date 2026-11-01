@@ -338,3 +338,58 @@ Kolom baru: `users.phone_verified_at`. Password minimum 8 karakter. View lama (`
 - E2E produksi: tamu terkunci → daftar pelamar → WA terbuka → simpan/hapus → profil + CV (200) → daftar usaha → admin traffic melihat keduanya; **0 console error**.
 - Keamanan: HTML tamu tidak memuat `wa.me`/nomor (0 kemunculan), `track-click` 401 tanpa login, `/admin/pengguna` 403 untuk pelamar.
 - Server: Laravel 12.70.2, deploy via `~/scripts/deploy-loker.sh`, backup harian 03:20.
+---
+
+# Sesi 6 — audit menyeluruh + perbaikan halaman admin login (1 November 2026)
+
+## AC. Perbaikan visual halaman admin login
+
+| Masalah | Akar masalah | Perbaikan |
+|---|---|---|
+| Kartu menempel ke kiri, catatan keamanan terhimpit di samping | `body` memakai `display:flex` sehingga kartu dan catatan menjadi dua kolom | dibungkus `.shell` (flex column) → kartu center, catatan di bawah |
+| Kontras input & placeholder rendah | placeholder `rgba(255,255,255,.2)`, border `.1` | placeholder `.58` (**kontras 5.85:1**), border `.28`, fokus lebih jelas |
+| Checkbox putih mencolok | checkbox bawaan browser | checkbox kustom (border, centang, `:focus-visible`) |
+| Halaman bisa scroll aneh di mobile | `body` setinggi 100vh + `overflow:hidden` | `min-height:100dvh`, dekorasi `position:fixed`, tanpa overflow |
+| Teks keamanan tidak terbaca | ukuran & warna terlalu redup | ukuran 0.72rem, warna `.62`, line-height 1.5 |
+
+Tambahan: `meta robots noindex,nofollow`, `autofocus`, label "Ingat sesi saya" yang bisa diklik,
+dukungan `prefers-reduced-motion`, dan hanya pesan error pertama yang ditampilkan (tidak menumpuk).
+
+## AD. Audit fungsional menyeluruh (produksi)
+
+**27/27 skenario lulus** — beranda, pencarian kata kunci, filter kategori, filter lokasi Kaltim,
+detail loker aktif, detail pending 404, kunci WA untuk tamu, daftar pelamar, logout, login ulang,
+WA terbuka setelah login, simpan/hapus loker, profil + CV (HTTP 200), pelamar ditolak dari admin (403),
+daftar pemilik usaha, lengkapi profil + selfie, pasang loker valid, lokasi luar Kaltim ditolak,
+modal verifikasi menampilkan selfie (HTTP 200), setujui gratis, halaman pengguna admin,
+filter peran, loker baru tayang publik, dan klik tamu diblokir (419).
+
+## AE. Audit visual & performa
+
+- **75 kombinasi** (15 halaman × 5 viewport 1440/1280/1024/768/390): **0 error, 0 overflow**.
+- Waktu muat: median **1,35 s**, p95 **2,04 s**, maksimum **2,61 s** (tanpa outlier).
+- Halaman admin login diperiksa khusus: kartu center (`centerDelta = 0`) dan catatan berada **di bawah** kartu (`stacked = true`) pada 1440 & 390.
+
+## AF. Pemeriksaan keamanan
+
+| Uji | Hasil |
+|---|---|
+| Header HSTS / nosniff / X-Frame-Options / Referrer-Policy / Permissions-Policy | ada |
+| `X-Powered-By` | tidak ada |
+| Cookie sesi | `secure`, `httponly`, `samesite=lax` |
+| `POST` tanpa token CSRF | 419 (ditolak) |
+| Path traversal `/dokumen/../../etc/passwd` | 404 |
+| Tamu membuka `/dokumen/...` | 302 ke login |
+| Pelamar membuka `/admin/pengguna` | 403 |
+| Nomor WA / `wa.me` di HTML tamu | 0 kemunculan |
+
+## AG. Buku panduan PDF
+
+`~/Documents/Panduan-LokerUMKM-Kaltim.pdf` — **16 halaman A4**, 11 bagian, 2.385 kata:
+akses cepat & kredensial pengujian, peran, panduan pelamar, pemilik usaha, admin, alur status,
+aturan wilayah/premium, keamanan & privasi, troubleshooting, informasi teknis, checklist serah terima.
+
+Verifikasi: `pdfinfo` 16 halaman A4, `pdftotext` memuat seluruh judul bagian & kredensial,
+semua halaman menghasilkan render non-kosong, dan pemeriksaan bounding-box tidak menemukan teks keluar margin.
+
+> Kredensial **hanya ada di PDF dan di server** (`~/.hermes/.secrets/`), tidak pernah masuk repositori.
