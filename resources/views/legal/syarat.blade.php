@@ -34,7 +34,7 @@
                 <li>Nomor WhatsApp wajib aktif karena menjadi kontak lamaran dan sarana verifikasi.</li>
                 <li>Lowongan yang dikirim berstatus <em>pending</em> dan tayang setelah disetujui admin.</li>
                 <li>Masa tayang lowongan adalah 30 hari dan dapat diperpanjang.</li>
-                <li>Paket premium bersifat opsional (Rp 50.000) dan hanya disetujui bila bukti pembayaran valid.</li>
+                <li>Paket premium bersifat opsional (Rp {{ number_format(config('loker.premium.price'), 0, ',', '.') }}) dan hanya disetujui bila bukti pembayaran valid.</li>
             </ul>
         </section>
 

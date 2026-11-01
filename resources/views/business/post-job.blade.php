@@ -116,7 +116,7 @@
                 <input type="checkbox" name="is_premium" value="1" x-model="isPremium" {{ old('is_premium') ? 'checked' : '' }}
                     class="w-4 h-4 mt-0.5 rounded border-amber-400 text-amber-500 focus:ring-amber-500">
                 <div>
-                    <span class="block font-bold text-amber-900 text-sm">Ya, ajukan Premium (Rp 50.000)</span>
+                    <span class="block font-bold text-amber-900 text-sm">Ya, ajukan Premium (Rp {{ number_format(config('loker.premium.price'), 0, ',', '.') }})</span>
                     <p class="text-xs font-medium text-amber-700 mt-0.5">
                         Loker premium tampil paling atas dan diberi badge khusus. Status premium baru aktif
                         setelah admin memverifikasi bukti pembayaran Anda.
@@ -126,8 +126,15 @@
 
             <div x-show="isPremium" x-cloak class="mt-4 pt-4 border-t border-amber-200">
                 <div class="bg-white p-3.5 rounded-xl border border-amber-100 text-xs font-medium text-amber-800 mb-3">
-                    Transfer ke <strong>BCA 1234567890 a.n. Info Loker UMKM</strong> sebesar <strong>Rp 50.000</strong>,
-                    lalu unggah bukti transfer di bawah ini.
+                    @if(config('loker.premium.bank_info'))
+                        Transfer ke <strong>{{ config('loker.premium.bank_info') }}</strong> sebesar
+                        <strong>Rp {{ number_format(config('loker.premium.price'), 0, ',', '.') }}</strong>,
+                        lalu unggah bukti transfer di bawah ini.
+                    @else
+                        Hubungi admin untuk nomor rekening tujuan sebesar
+                        <strong>Rp {{ number_format(config('loker.premium.price'), 0, ',', '.') }}</strong>,
+                        lalu unggah bukti transfer di bawah ini.
+                    @endif
                 </div>
 
                 <label for="bukti_pembayaran" class="block text-[11px] font-bold text-amber-900 mb-1.5 uppercase tracking-wide">

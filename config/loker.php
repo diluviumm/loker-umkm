@@ -13,6 +13,11 @@ return [
     |
     */
 
+    'premium' => [
+        'price'     => (int) env('PREMIUM_PRICE', 50000),
+        'bank_info' => env('PREMIUM_BANK_INFO'),
+    ],
+
     'retention' => [
         'days'    => (int) env('DOCUMENT_RETENTION_DAYS', 365),
         'enforce' => (bool) env('DOCUMENT_RETENTION_ENFORCE', false),
